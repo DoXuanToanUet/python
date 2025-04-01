@@ -57,7 +57,7 @@ class YouTubeAutomator:
             
             # Like video
             try:
-                like_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Thích' or @aria-label='Like']")))
+                like_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".ytLikeButtonViewModelHost")))
                 like_button.click()
                 print("Đã like video.")
                 time.sleep(1)
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     try:
         bot.process_channel(
             channel_url=channel_url,
-            max_videos=10,  # Giới hạn số video xử lý
+            max_videos=1,  # Giới hạn số video xử lý
             delay_between_videos=30  # Thời gian chờ giữa các video (giây)
         )
     except Exception as e:

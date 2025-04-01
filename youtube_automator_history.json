@@ -1,0 +1,36 @@
+{
+  "sessions": [
+    {
+      "channel_url": "https://www.youtube.com/@toanyoutuber6376/videos",
+      "start_time": "2025-04-01 14:07:03",
+      "max_videos": 1,
+      "delay": 30,
+      "status": "running"
+    },
+    {
+      "channel_url": "https://www.youtube.com/@toanyoutuber6376/videos",
+      "start_time": "2025-04-01 14:07:56",
+      "max_videos": 1,
+      "delay": 30,
+      "status": "running"
+    }
+  ],
+  "videos": [
+    {
+      "url": "https://www.youtube.com/watch?v=9NiiTPlbT3Y&pp=0gcJCb8Ag7Wk3p_U",
+      "title": "Cách ẩn hiện lượt like và dislike video trên Youtube",
+      "liked": false,
+      "commented": false,
+      "comment_text": "",
+      "timestamp": "2025-04-01 14:07:20"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=9NiiTPlbT3Y",
+      "title": "Cách ẩn hiện lượt like và dislike video trên Youtube",
+      "liked": false,
+      "commented": true,
+      "comment_text": "Nội dung tuyệt vời, tôi đã học được nhiều điều!",
+      "timestamp": "2025-04-01 14:08:13"
+    }
+  ]
+}

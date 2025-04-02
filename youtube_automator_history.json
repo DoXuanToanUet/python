@@ -13,6 +13,116 @@
       "max_videos": 1,
       "delay": 30,
       "status": "running"
+    },
+    {
+      "channel_url": "https://www.youtube.com/@toanyoutuber6376/videos",
+      "start_time": "2025-04-01 14:35:26",
+      "max_videos": 1,
+      "delay": 30,
+      "status": "running"
+    },
+    {
+      "channel_url": "https://www.youtube.com/@toanyoutuber6376/videos",
+      "start_time": "2025-04-01 14:36:43",
+      "max_videos": 10,
+      "delay": 30,
+      "status": "running"
+    },
+    {
+      "channel_url": "https://www.youtube.com/@xuantoanvideo/videos",
+      "start_time": "2025-04-02 09:21:46",
+      "max_videos": 1,
+      "delay": 30,
+      "status": "running"
+    },
+    {
+      "session_id": "session_1743561038",
+      "channel_url": "https://www.youtube.com/@xuantoanvideo/videos",
+      "start_time": "2025-04-02 09:30:38",
+      "videos": [
+        "https://www.youtube.com/watch?v=cdNCwo-me80&pp=0gcJCb8Ag7Wk3p_U"
+      ],
+      "channel_name": "",
+      "end_time": "2025-04-02 09:31:07",
+      "videos_processed": 1,
+      "processed_videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=cdNCwo-me80&pp=0gcJCb8Ag7Wk3p_U",
+          "title": "Hướng dẫn sử dụng Filmora 11 cho người mới bắt đầu",
+          "liked": true,
+          "commented": true,
+          "comment_text": "Cảm ơn vì nội dung hữu ích!",
+          "timestamp": "2025-04-02 09:30:55",
+          "session_id": "session_1743561038"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "session_id": "session_1743561139",
+      "channel_url": "https://www.youtube.com/@xuantoanvideo/videos",
+      "start_time": "2025-04-02 09:32:19",
+      "videos": [
+        "https://www.youtube.com/watch?v=cdNCwo-me80",
+        "https://www.youtube.com/watch?v=Mr2ZTUCSD9c",
+        "https://www.youtube.com/watch?v=Bre3UCv2OjY"
+      ],
+      "channel_name": "",
+      "end_time": "2025-04-02 09:34:17",
+      "videos_processed": 3,
+      "processed_videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=cdNCwo-me80",
+          "title": "Hướng dẫn sử dụng Filmora 11 cho người mới bắt đầu",
+          "liked": true,
+          "commented": true,
+          "comment_text": "Nội dung tuyệt vời, tôi đã học được nhiều điều!",
+          "timestamp": "2025-04-02 09:32:36",
+          "session_id": "session_1743561139"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=Mr2ZTUCSD9c",
+          "title": "Tạo video  HIGHLIGHT liên minh bằng Filmora X",
+          "liked": true,
+          "commented": true,
+          "comment_text": "Tôi thích video này, đã đăng ký kênh của bạn!",
+          "timestamp": "2025-04-02 09:33:20",
+          "session_id": "session_1743561139"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=Bre3UCv2OjY",
+          "title": "Hiệu ứng chữ đánh máy gõ bàn phím với Filmora X",
+          "liked": true,
+          "commented": true,
+          "comment_text": "Nội dung tuyệt vời, tôi đã học được nhiều điều!",
+          "timestamp": "2025-04-02 09:34:04",
+          "session_id": "session_1743561139"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "session_id": "session_1743563574",
+      "channel_url": "https://www.youtube.com/@xuantoanvideo/videos",
+      "start_time": "2025-04-02 10:12:54",
+      "videos": [
+        "https://www.youtube.com/watch?v=cdNCwo-me80"
+      ],
+      "channel_name": "",
+      "end_time": "2025-04-02 10:13:25",
+      "videos_processed": 1,
+      "processed_videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=cdNCwo-me80",
+          "title": "Hướng dẫn sử dụng Filmora 11 cho người mới bắt đầu",
+          "liked": true,
+          "commented": true,
+          "comment_text": "Video rất hay cảm ơn bạn đã chia sẻ",
+          "timestamp": "2025-04-02 10:13:12",
+          "session_id": "session_1743563574"
+        }
+      ],
+      "status": "completed"
     }
   ],
   "videos": [
@@ -31,6 +141,107 @@
       "commented": true,
       "comment_text": "Nội dung tuyệt vời, tôi đã học được nhiều điều!",
       "timestamp": "2025-04-01 14:08:13"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=9NiiTPlbT3Y",
+      "title": "Cách ẩn hiện lượt like và dislike video trên Youtube",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Video rất hay, cảm ơn bạn đã chia sẻ!",
+      "timestamp": "2025-04-01 14:35:43"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=9NiiTPlbT3Y",
+      "title": "Cách ẩn hiện lượt like và dislike video trên Youtube",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Video rất hay, cảm ơn bạn đã chia sẻ!",
+      "timestamp": "2025-04-01 14:37:00"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=5o-Lr9wnPjI",
+      "title": "Hướng dẫn làm video bằng hình ảnh với Filmora 9",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Cảm ơn vì nội dung hữu ích!",
+      "timestamp": "2025-04-01 14:37:44"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=6bGXUSSCLng",
+      "title": "Hướng dẫn sử dụng Filmora 9 phần 2 biên tập video cho Youtuber",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Video rất hay, cảm ơn bạn đã chia sẻ!",
+      "timestamp": "2025-04-01 14:38:28"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=8dvD6SA0pO8",
+      "title": "Hướng dẫn sử dụng phần mềm Filmora 9 cho người mới bắt đầu Phần 1",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Nội dung tuyệt vời, tôi đã học được nhiều điều!",
+      "timestamp": "2025-04-01 14:39:13"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=BghupQlCBqE",
+      "title": "Hướng dẫn cài đặt Adobe Photoshop 2020 chỉnh sửa ảnh chuyên nghiệp",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Nội dung tuyệt vời, tôi đã học được nhiều điều!",
+      "timestamp": "2025-04-01 14:39:57"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=OWrexb-1Qhs",
+      "title": "Hướng dẫn cài đặt phần mềm chỉnh sửa video Filmora 9",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Video rất hay, cảm ơn bạn đã chia sẻ!",
+      "timestamp": "2025-04-01 14:40:41"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=cdNCwo-me80&pp=0gcJCb8Ag7Wk3p_U",
+      "title": "Hướng dẫn sử dụng Filmora 11 cho người mới bắt đầu",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Cảm ơn vì nội dung hữu ích!",
+      "timestamp": "2025-04-02 09:30:55",
+      "session_id": "session_1743561038"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=cdNCwo-me80",
+      "title": "Hướng dẫn sử dụng Filmora 11 cho người mới bắt đầu",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Nội dung tuyệt vời, tôi đã học được nhiều điều!",
+      "timestamp": "2025-04-02 09:32:36",
+      "session_id": "session_1743561139"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=Mr2ZTUCSD9c",
+      "title": "Tạo video  HIGHLIGHT liên minh bằng Filmora X",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Tôi thích video này, đã đăng ký kênh của bạn!",
+      "timestamp": "2025-04-02 09:33:20",
+      "session_id": "session_1743561139"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=Bre3UCv2OjY",
+      "title": "Hiệu ứng chữ đánh máy gõ bàn phím với Filmora X",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Nội dung tuyệt vời, tôi đã học được nhiều điều!",
+      "timestamp": "2025-04-02 09:34:04",
+      "session_id": "session_1743561139"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=cdNCwo-me80",
+      "title": "Hướng dẫn sử dụng Filmora 11 cho người mới bắt đầu",
+      "liked": true,
+      "commented": true,
+      "comment_text": "Video rất hay cảm ơn bạn đã chia sẻ",
+      "timestamp": "2025-04-02 10:13:12",
+      "session_id": "session_1743563574"
     }
   ]
 }

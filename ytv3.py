@@ -25,6 +25,7 @@ class WorkerSignals(QObject):
     log = pyqtSignal(str)
     finished = pyqtSignal()
     history_update = pyqtSignal(dict)
+    session_update = pyqtSignal(dict)  # Thêm tín hiệu mới cho phiên làm việc
 
 class YouTubeAutomator:
     def __init__(self, signals):
@@ -76,7 +77,7 @@ class YouTubeAutomator:
         self.signals.log.emit(f"Found {len(video_info)} videos from channel")
         return video_info
     
-    def like_and_comment(self, video_url, video_title):
+    def like_and_comment(self, video_url, video_title, session_id):
         """Open video, like and comment"""
         self.signals.log.emit(f"Opening video: {video_url}")
         self.signals.log.emit(f"Title: {video_title}")
@@ -88,7 +89,8 @@ class YouTubeAutomator:
             "liked": False,
             "commented": False,
             "comment_text": "",
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "session_id": session_id  # Thêm ID phiên làm việc vào dữ liệu video
         }
         
         try:
@@ -132,26 +134,33 @@ class YouTubeAutomator:
                 
                 # Return video interaction result for history
                 self.signals.history_update.emit(result)
-                return True
+                return result
             except (TimeoutException, NoSuchElementException) as e:
                 self.signals.log.emit(f"⚠️ Error commenting: {e}")
                 self.signals.history_update.emit(result)
-                return False
+                return result
             
         except Exception as e:
             self.signals.log.emit(f"❌ Error processing video {video_url}: {e}")
             self.signals.history_update.emit(result)
-            return False
+            return result
     
     def process_channel(self, channel_url, max_videos=None, delay_between_videos=30):
         """Process entire channel: open each video, like and comment"""
-        # Initialize session history
+        # Tạo ID phiên độc nhất
+        session_id = f"session_{int(time.time())}"
+        
+        # Khởi tạo thông tin phiên làm việc
         session_start = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         session_history = {
+            "session_id": session_id,
             "channel_url": channel_url,
             "start_time": session_start,
             "videos": []
         }
+        
+        # Gửi thông tin phiên làm việc ban đầu
+        self.signals.session_update.emit(session_history)
         
         # Get video list
         try:
@@ -171,22 +180,34 @@ class YouTubeAutomator:
                 self.signals.log.emit(f"Limited to first {max_videos} videos")
             
             # Process each video
+            processed_videos = []
             for i, (url, title) in enumerate(video_info):
                 self.signals.log.emit(f"\n📺 Processing video {i+1}/{len(video_info)}")
-                success = self.like_and_comment(url, title)
+                
+                # Xử lý video với session_id
+                video_result = self.like_and_comment(url, title, session_id)
+                processed_videos.append(video_result)
+                
+                # Cập nhật danh sách URL video đã xử lý trong phiên
+                session_history["videos"].append(url)
                 
                 # Update progress
                 progress_percent = int((i + 1) / len(video_info) * 100)
                 self.signals.progress.emit(progress_percent)
                 
                 # Wait between videos to avoid detection as bot
-                if i < len(video_info) - 1 and success:  # Don't wait after last video
+                if i < len(video_info) - 1:  # Don't wait after last video
                     self.signals.log.emit(f"⏱️ Waiting {delay_between_videos} seconds before next video...")
                     time.sleep(delay_between_videos)
             
-            # Complete session history
+            # Hoàn thành thông tin phiên làm việc
             session_history["end_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             session_history["videos_processed"] = len(video_info)
+            session_history["processed_videos"] = processed_videos
+            session_history["status"] = "completed"
+            
+            # Cập nhật thông tin phiên làm việc
+            self.signals.session_update.emit(session_history)
             
             self.signals.log.emit("\n✅ All videos processed successfully!")
             self.signals.progress.emit(100)
@@ -194,8 +215,13 @@ class YouTubeAutomator:
             
         except Exception as e:
             self.signals.log.emit(f"❌ Error: {e}")
+            
+            # Cập nhật thông tin lỗi vào phiên làm việc
             session_history["end_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             session_history["error"] = str(e)
+            session_history["status"] = "error"
+            self.signals.session_update.emit(session_history)
+            
             self.signals.finished.emit()
 
 class HistoryManager:
@@ -226,13 +252,31 @@ class HistoryManager:
         self.save_history()
     
     def add_session(self, session_data):
-        """Add a complete session to history"""
-        self.history["sessions"].append(session_data)
+        """Add or update a session in history"""
+        # Kiểm tra xem phiên làm việc đã tồn tại chưa
+        session_id = session_data.get("session_id")
+        if not session_id:
+            # Nếu không có ID phiên, thêm mới
+            self.history["sessions"].append(session_data)
+        else:
+            # Nếu đã có ID phiên, cập nhật phiên làm việc hiện có
+            for i, session in enumerate(self.history["sessions"]):
+                if session.get("session_id") == session_id:
+                    self.history["sessions"][i] = session_data
+                    break
+            else:
+                # Nếu không tìm thấy phiên làm việc, thêm mới
+                self.history["sessions"].append(session_data)
+        
         self.save_history()
     
     def get_history(self):
         """Return full history"""
         return self.history
+    
+    def get_session_videos(self, session_id):
+        """Get all videos from a specific session"""
+        return [video for video in self.history["videos"] if video.get("session_id") == session_id]
 
 class YouTubeAutomationUI(QMainWindow):
     def __init__(self):
@@ -249,6 +293,7 @@ class YouTubeAutomationUI(QMainWindow):
         self.worker_signals.log.connect(self.append_log)
         self.worker_signals.finished.connect(self.on_process_finished)
         self.worker_signals.history_update.connect(self.update_history)
+        self.worker_signals.session_update.connect(self.update_session)  # Kết nối tín hiệu phiên mới
         
         # Initialize history manager BEFORE initUI
         self.history_manager = HistoryManager()
@@ -464,35 +509,75 @@ class YouTubeAutomationUI(QMainWindow):
         self.display_history()
     
     def display_history(self):
-        """Display processing history in the history tab"""
+        """Hiển thị lịch sử xử lý trong tab lịch sử, được tổ chức theo phiên làm việc"""
         history_data = self.history_manager.get_history()
         
-        # Clear existing content
+        # Xóa nội dung hiện tại
         self.history_text.clear()
         
-        if not history_data["videos"]:
-            self.history_text.append("No history available yet.")
+        if not history_data["sessions"]:
+            self.history_text.append("Chưa có lịch sử nào.")
             return
         
-        # Sort videos by timestamp (newest first)
-        sorted_videos = sorted(
-            history_data["videos"], 
-            key=lambda x: datetime.strptime(x.get("timestamp", "2000-01-01 00:00:00"), "%Y-%m-%d %H:%M:%S"),
+        # Sắp xếp phiên làm việc theo thời gian (mới nhất lên đầu)
+        sorted_sessions = sorted(
+            history_data["sessions"], 
+            key=lambda x: datetime.strptime(x.get("start_time", "2000-01-01 00:00:00"), "%Y-%m-%d %H:%M:%S"),
             reverse=True
         )
         
-        # Display history
-        self.history_text.append("### Recent Activity ###\n")
+        # Hiển thị lịch sử
+        self.history_text.append("### LỊCH SỬ PHIÊN LÀM VIỆC ###\n")
         
-        for i, video in enumerate(sorted_videos[:50]):  # Limit to 50 most recent entries
-            self.history_text.append(f"Entry #{i+1} - {video.get('timestamp', 'Unknown time')}")
-            self.history_text.append(f"Title: {video.get('title', 'Unknown title')}")
-            self.history_text.append(f"URL: {video.get('url', 'Unknown URL')}")
-            self.history_text.append(f"Liked: {'✅' if video.get('liked', False) else '❌'}")
-            self.history_text.append(f"Commented: {'✅' if video.get('commented', False) else '❌'}")
-            if video.get('commented', False):
-                self.history_text.append(f"Comment: \"{video.get('comment_text', '')}\"")
-            self.history_text.append("-" * 50 + "\n")
+        for i, session in enumerate(sorted_sessions[:20]):  # Giới hạn 20 phiên làm việc gần nhất
+            session_start = session.get("start_time", "Không rõ")
+            session_end = session.get("end_time", "Đang chạy")
+            channel_url = session.get("channel_url", "Kênh không xác định")
+            channel_name = session.get("channel_name", "Tên kênh không xác định")
+            session_id = session.get("session_id", "")
+            
+            self.history_text.append(f"Phiên #{i+1} - {session_start}")
+            self.history_text.append(f"Kênh: {channel_name}")
+            self.history_text.append(f"URL: {channel_url}")
+            self.history_text.append(f"Thời gian kết thúc: {session_end}")
+            
+            status = session.get("status", "unknown")
+            if status == "error":
+                error_msg = session.get("error", "Không rõ lỗi")
+                self.history_text.append(f"Trạng thái: ❌ Lỗi - {error_msg}")
+            elif status == "completed":
+                self.history_text.append(f"Trạng thái: ✅ Hoàn thành")
+            else:
+                self.history_text.append(f"Trạng thái: ⏳ {status}")
+            
+            videos_processed = session.get("videos_processed", 0)
+            self.history_text.append(f"Số video đã xử lý: {videos_processed}")
+            
+            # Tìm tất cả video trong phiên làm việc này
+            session_videos = self.history_manager.get_session_videos(session_id)
+            
+            # Hiển thị thống kê thành công
+            liked_count = sum(1 for v in session_videos if v.get("liked", False))
+            commented_count = sum(1 for v in session_videos if v.get("commented", False))
+            
+            self.history_text.append(f"Đã like: {liked_count} video")
+            self.history_text.append(f"Đã bình luận: {commented_count} video")
+            
+            # Hiển thị chi tiết từng video nếu có
+            if session_videos:
+                self.history_text.append("\nChi tiết video:")
+                for j, video in enumerate(session_videos):
+                    self.history_text.append(f"  {j+1}. {video.get('title', 'Tiêu đề không xác định')}")
+                    self.history_text.append(f"     Like: {'✅' if video.get('liked', False) else '❌'}")
+                    self.history_text.append(f"     Bình luận: {'✅' if video.get('commented', False) else '❌'}")
+                    if video.get('commented', False):
+                        comment = video.get('comment_text', '')
+                        # Cắt ngắn bình luận dài
+                        if len(comment) > 50:
+                            comment = comment[:47] + "..."
+                        self.history_text.append(f"     Nội dung: \"{comment}\"")
+            
+            self.history_text.append("=" * 50 + "\n")
     
     def append_log(self, message):
         """Add a message to the log with timestamp"""
@@ -511,17 +596,21 @@ class YouTubeAutomationUI(QMainWindow):
         """Update history with new video interaction"""
         self.history_manager.add_video_interaction(video_data)
     
+    def update_session(self, session_data):
+        """Cập nhật lịch sử với thông tin phiên làm việc"""
+        self.history_manager.add_session(session_data)
+    
     def start_process(self):
         """Start the automation process in a separate thread"""
         # Validate inputs
         channel_url = self.url_input.text().strip()
         if not channel_url:
-            self.append_log("❌ Please enter a valid channel URL")
+            self.append_log("❌ Vui lòng nhập URL kênh hợp lệ")
             return
         
         if not (channel_url.startswith("https://www.youtube.com/") or 
                 channel_url.startswith("https://youtube.com/")):
-            self.append_log("❌ Invalid YouTube URL format")
+            self.append_log("❌ Định dạng URL YouTube không hợp lệ")
             return
         
         # Get settings
@@ -532,18 +621,8 @@ class YouTubeAutomationUI(QMainWindow):
         self.start_button.setEnabled(False)
         self.stop_button.setEnabled(True)
         self.progress_bar.setValue(0)
-        self.append_log(f"Starting process for channel: {channel_url}")
-        self.append_log(f"Settings: Max Videos={max_videos}, Delay={delay_between_videos}s")
-        
-        # Record session start in history
-        session_start = {
-            "channel_url": channel_url,
-            "start_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "max_videos": max_videos,
-            "delay": delay_between_videos,
-            "status": "running"
-        }
-        self.history_manager.add_session(session_start)
+        self.append_log(f"Bắt đầu xử lý kênh: {channel_url}")
+        self.append_log(f"Cài đặt: Số lượng video tối đa={max_videos}, Thời gian chờ={delay_between_videos}s")
         
         # Start worker thread
         self.worker_thread = threading.Thread(
@@ -563,13 +642,13 @@ class YouTubeAutomationUI(QMainWindow):
                 delay_between_videos=delay_between_videos
             )
         except Exception as e:
-            self.worker_signals.log.emit(f"❌ Critical error: {e}")
+            self.worker_signals.log.emit(f"❌ Lỗi nghiêm trọng: {e}")
             self.worker_signals.finished.emit()
     
     def stop_process(self):
         """Stop the current process"""
         if self.worker_thread and self.worker_thread.is_alive():
-            self.append_log("🛑 Stopping process... (may take a moment)")
+            self.append_log("🛑 Đang dừng tiến trình... (có thể mất một lúc)")
             # We can't directly stop the thread, but we'll change the UI state
             # The thread will terminate when it finishes its current operation
             self.on_process_finished()
@@ -587,7 +666,7 @@ class YouTubeAutomationUI(QMainWindow):
         """Handle window close event"""
         if self.worker_thread and self.worker_thread.is_alive():
             # If thread is running, try to clean up
-            self.append_log("Closing application...")
+            self.append_log("Đang đóng ứng dụng...")
         event.accept()
 
 if __name__ == "__main__":

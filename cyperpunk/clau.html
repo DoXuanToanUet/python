@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Hacker Terminal</title>
+    <style>
+        :root {
+            --main-bg: #0a0a12;
+            --terminal-bg: #0c0c14;
+            --neon-green: #0f9;
+            --neon-blue: #0af;
+            --neon-red: #f55;
+            --neon-purple: #c6f;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--main-bg);
+            color: var(--neon-green);
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid var(--neon-purple);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            text-shadow: 0 0 5px var(--neon-purple), 0 0 10px var(--neon-purple);
+            color: var(--neon-purple);
+        }
+        
+        .status {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .status-item {
+            padding: 5px 10px;
+            border: 1px solid var(--neon-green);
+            border-radius: 5px;
+        }
+        
+        .terminal {
+            flex: 1;
+            background-color: var(--terminal-bg);
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .terminal-content {
+            height: calc(100% - 40px);
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding-bottom: 20px;
+        }
+        
+        .input-line {
+            display: flex;
+            margin-top: 10px;
+        }
+        
+        .prompt {
+            color: var(--neon-blue);
+            margin-right: 10px;
+        }
+        
+        #user-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--neon-green);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .response {
+            margin-top: 5px;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+        
+        .success {
+            color: var(--neon-green);
+        }
+        
+        .error {
+            color: var(--neon-red);
+        }
+        
+        .warning {
+            color: #fd7;
+        }
+        
+        .info {
+            color: var(--neon-blue);
+        }
+        
+        .level-info {
+            border: 1px solid var(--neon-purple);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: rgba(200, 100, 255, 0.1);
+        }
+        
+        .intro {
+            border-left: 3px solid var(--neon-purple);
+            padding-left: 10px;
+            margin: 15px 0;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: var(--terminal-bg);
+            border: 2px solid var(--neon-purple);
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            box-shadow: 0 0 15px var(--neon-purple);
+            color: var(--neon-green);
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--neon-purple);
+            text-shadow: 0 0 5px var(--neon-purple);
+        }
+        
+        .button {
+            background-color: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 8px 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+        
+        .button:hover {
+            background-color: var(--neon-green);
+            color: black;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .grid-item {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--neon-blue);
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .grid-item:hover {
+            background-color: rgba(0, 200, 255, 0.2);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        /* Animations */
+        @keyframes flicker {
+            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+                opacity: 1;
+            }
+            20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+                opacity: 0.4;
+            }
+        }
+        
+        .flicker {
+            animation: flicker 4s infinite;
+        }
+        
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 5px var(--neon-green);
+            }
+            50% {
+                text-shadow: 0 0 20px var(--neon-green), 0 0 30px var(--neon-green);
+            }
+            100% {
+                text-shadow: 0 0 5px var(--neon-green);
+            }
+        }
+        
+        .glow {
+            animation: glow 2s infinite;
+        }
+        
+        /* Scanlines effect */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0) 50%,
+                rgba(0, 0, 0, 0.3) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: #111;
+            border: 1px solid var(--neon-blue);
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--neon-green);
+            transition: width 0.3s;
+        }
+        
+        /* Help menu */
+        .help-menu {
+            padding: 10px;
+            border: 1px solid var(--neon-blue);
+            background-color: rgba(0, 170, 255, 0.1);
+            margin: 10px 0;
+        }
+        
+        .help-command {
+            display: flex;
+            margin: 5px 0;
+        }
+        
+        .command-name {
+            width: 120px;
+            color: var(--neon-blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">NEON HACKER TERMINAL v1.0</div>
+            <div class="status">
+                <div class="status-item">Level: <span id="level-display">1</span></div>
+                <div class="status-item">Target: <span id="target-display">Personal Server</span></div>
+                <div class="status-item">Status: <span id="status-display" class="glow">CONNECTED</span></div>
+            </div>
+        </div>
+        
+        <div class="terminal">
+            <div class="scanlines"></div>
+            <div class="terminal-content" id="terminal-content">
+                <!-- Terminal content will be added here -->
+            </div>
+            <div class="input-line">
+                <div class="prompt" id="prompt">hacker@neoncity:~$</div>
+                <input type="text" id="user-input" autofocus>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Level completion modal -->
+    <div class="modal" id="level-modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-title">LEVEL COMPLETE</div>
+            <p id="modal-message">You've successfully completed this level!</p>
+            <button class="button" id="next-level">NEXT LEVEL</button>
+        </div>
+    </div>
+    
+    <!-- Game over modal -->
+    <div class="modal" id="game-over-modal">
+        <div class="modal-content">
+            <div class="modal-title" style="color: var(--neon-red);">CONNECTION TERMINATED</div>
+            <p>Your hacking attempt has been detected and your connection has been terminated.</p>
+            <button class="button" id="retry-button">RETRY LEVEL</button>
+        </div>
+    </div>
+    
+    <!-- Victory modal -->
+    <div class="modal" id="victory-modal">
+        <div class="modal-content">
+            <div class="modal-title" style="color: var(--neon-green);">MISSION COMPLETE</div>
+            <p>Congratulations! You've successfully completed all missions and proved yourself as an elite hacker!</p>
+            <div>Final Status: <span class="success">LEGENDARY HACKER</span></div>
+            <button class="button" id="restart-button">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            currentLevel: 1,
+            maxLevel: 5,
+            history: [],
+            currentDir: '/',
+            fileSystem: {},
+            targetSystems: [
+                "Personal Server",
+                "Corporate Network",
+                "Government Database", 
+                "Defense System",
+                "Megacorp Security"
+            ],
+            commands: {},
+            passwordAttempts: 0,
+            maxPasswordAttempts: 3,
+        };
+        
+        // DOM elements
+        const terminalContent = document.getElementById('terminal-content');
+        const userInput = document.getElementById('user-input');
+        const levelDisplay = document.getElementById('level-display');
+        const targetDisplay = document.getElementById('target-display');
+        const statusDisplay = document.getElementById('status-display');
+        const prompt = document.getElementById('prompt');
+        const levelModal = document.getElementById('level-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const nextLevelButton = document.getElementById('next-level');
+        const gameOverModal = document.getElementById('game-over-modal');
+        const retryButton = document.getElementById('retry-button');
+        const victoryModal = document.getElementById('victory-modal');
+        const restartButton = document.getElementById('restart-button');
+        
+        // Initialize game
+        function initGame() {
+            setupLevel(1);
+            
+            // Event listeners
+            userInput.addEventListener('keydown', handleInput);
+            nextLevelButton.addEventListener('click', nextLevel);
+            retryButton.addEventListener('click', retryLevel);
+            restartButton.addEventListener('click', restartGame);
+            
+            // Welcome message
+            addToTerminal(`
+<div class="intro">
+    <span style="color: var(--neon-purple); font-size: 1.5rem;">NEON HACKER TERMINAL v1.0</span>
+    <span style="color: var(--neon-red);">[UNAUTHORIZED ACCESS]</span>
+
+    Welcome to the underground network, hacker. Your journey into the depths of the digital world begins now.
+    Each level will challenge your skills and intuition as you navigate increasingly secure systems.
+    
+    Type <span class="info">help</span> to see available commands.
+    
+    REMEMBER: Stay under the radar. Too many failed attempts will trigger security protocols.
+</div>`, 'intro');
+            
+            // Level info
+            showLevelInfo(1);
+        }
+        
+        // Setup level-specific content
+        function setupLevel(level) {
+            gameState.currentLevel = level;
+            gameState.passwordAttempts = 0;
+            levelDisplay.textContent = level;
+            targetDisplay.textContent = gameState.targetSystems[level - 1];
+            statusDisplay.textContent = "CONNECTED";
+            statusDisplay.className = "glow";
+            
+            // Reset filesystem for the new level
+            setupFileSystem(level);
+            
+            // Set up commands for this level
+            setupCommands(level);
+            
+            // Update prompt based on level
+            updatePrompt();
+        }
+        
+        // Set up filesystem for current level
+        function setupFileSystem(level) {
+            gameState.currentDir = '/';
+            
+            switch(level) {
+                case 1:
+                    gameState.fileSystem = {
+                        '/': {
+                            type: 'dir',
+                            content: {
+                                'documents': {
+                                    type: 'dir',
+                                    content: {
+                                        'personal.txt': {
+                                            type: 'file',
+                                            content: 'To-do list:\n1. Update security protocols\n2. Change admin password from default\n3. Install firewall updates'
+                                        },
+                                        'passwords.txt': {
+                                            type: 'file',
+                                            content: 'WiFi: neoncity2089\nEmail: [DELETED]'
+                                        }
+                                    }
+                                },
+                                'system': {
+                                    type: 'dir',
+                                    content: {
+                                        'users.db': {
+                                            type: 'file',
+                                            content: 'admin:********\nguest:guest123'
+                                        },
+                                        'access.log': {
+                                            type: 'file',
+                                            content: 'Last login: 2089-04-03 02:14:22\nFailed login attempts: 0'
+                                        }
+                                    }
+                                },
+                                'readme.txt': {
+                                    type: 'file',
+                                    content: 'Welcome to your personal server! Remember to check system files regularly.'
+                                }
+                            }
+                        }
+                    };
+                    break;
+                case 2:
+                    gameState.fileSystem = {
+                        '/': {
+                            type: 'dir',
+                            content: {
+                                'public': {
+                                    type: 'dir',
+                                    content: {
+                                        'index.html': {
+                                            type: 'file',
+                                            content: 'Welcome to NeonCor'
+                                        },
+                                        'about.html': {
+                                            type: 'file',
+                                            content: 'NeonCorp was founded in 2075'
+                                        }
+                                    }
+                                },
+                                'admin': {
+                                    type: 'dir',
+                                    locked: true,
+                                    content: {
+                                        'config.sys': {
+                                            type: 'file',
+                                            content: 'Admin access: TRUE\nSecurity Level: 2'
+                                        },
+                                        'users.db': {
+                                            type: 'file',
+                                            content: 'admin:neo2089\nuser1:password123'
+                                        }
+                                    }
+                                },
+                                'logs': {
+                                    type: 'dir',
+                                    content: {
+                                        'access.log': {
+                                            type: 'file',
+                                            content: 'IP: 192.168.1.1 - ACCESS GRANTED\nIP: 10.0.0.5 - ACCESS DENIED'
+                                        },
+                                        'error.log': {
+                                            type: 'file',
+                                            content: 'System error at 02:45 - Failed login attempt\nSystem error at 03:12 - Unauthorized scan detected'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    break;
+                case 3:
+                    gameState.fileSystem = {
+                        '/': {
+                            type: 'dir',
+                            content: {
+                                'public': {
+                                    type: 'dir',
+                                    content: {
+                                        'welcome.txt': {
+                                            type: 'file',
+                                            content: 'Welcome to the Government Database. Authorized access only.'
+                                        }
+                                    }
+                                },
+                                'classified': {
+                                    type: 'dir',
+                                    locked: true,
+                                    content: {
+                                        'project_x.enc': {
+                                            type: 'file',
+                                            encrypted: true,
+                                            content: 'V2VsY29tZSB0byBQcm9qZWN0IFguIFRoaXMgaXMgYSB0b3Agc2VjcmV0IHByb2plY3QgdG8gZGV2ZWxvcCBuZXcgY3liZXJuZXRpYyBlbmhhbmNlbWVudHMu'
+                                        },
+                                        'access_codes.enc': {
+                                            type: 'file',
+                                            encrypted: true,
+                                            content: 'U3lzdGVtIGFjY2VzcyBjb2RlOiBYWlo5OTc1'
+                                        }
+                                    }
+                                },
+                                'system': {
+                                    type: 'dir',
+                                    content: {
+                                        'users.db': {
+                                            type: 'file',
+                                            content: 'admin:[ENCRYPTED]\nuser1:[ENCRYPTED]'
+                                        },
+                                        'security.conf': {
+                                            type: 'file',
+                                            content: 'Security Level: HIGH\nEncryption: ENABLED\nAccess Key Required: TRUE'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    break;
+                case 4:
+                    gameState.fileSystem = {
+                        '/': {
+                            type: 'dir',
+                            content: {
+                                'system': {
+                                    type: 'dir',
+                                    content: {
+                                        'firewall.conf': {
+                                            type: 'file',
+                                            content: 'Firewall Status: ACTIVE\nBlocked IPs: 27\nSecurity Protocol: MAXIMUM'
+                                        },
+                                        'monitor.log': {
+                                            type: 'file',
+                                            content: 'System monitoring active...\nScanning for intrusions...'
+                                        }
+                                    }
+                                },
+                                'servers': {
+                                    type: 'dir',
+                                    content: {
+                                        'main.srv': {
+                                            type: 'file',
+                                            content: 'Server Status: ONLINE\nVulnerability Scan: CLEAN'
+                                        },
+                                        'backup.srv': {
+                                            type: 'file',
+                                            content: 'Backup Server Status: STANDBY\nLast Backup: 2089-04-02'
+                                        }
+                                    }
+                                },
+                                'control': {
+                                    type: 'dir',
+                                    locked: true,
+                                    content: {
+                                        'main_control.sys': {
+                                            type: 'file',
+                                            content: 'System Control Access Point\nAuthorization Required: TRUE'
+                                        },
+                                        'override.cmd': {
+                                            type: 'file',
+                                            content: 'Emergency Override Protocol: INACTIVE'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    break;
+                case 5:
+                    gameState.fileSystem = {
+                        '/': {
+                            type: 'dir',
+                            content: {
+                                'system': {
+                                    type: 'dir',
+                                    content: {
+                                        'security.log': {
+                                            type: 'file',
+                                            content: 'MAXIMUM SECURITY ENABLED\nQuantum Encryption: ACTIVE\nNeural Firewall: ACTIVE'
+                                        }
+                                    }
+                                },
+                                'vault': {
+                                    type: 'dir',
+                                    locked: true,
+                                    content: {
+                                        'client_data.db': {
+                                            type: 'file',
+                                            encrypted: true,
+                                            content: 'QWNjZXNzIHRvIGNsaWVudCBkYXRhIGdyYW50ZWQuIENvbmdyYXR1bGF0aW9ucyBvbiBjb21wbGV0aW5nIHRoZSBnYW1lIQ=='
+                                        },
+                                        'financial.records': {
+                                            type: 'file',
+                                            encrypted: true,
+                                            content: 'VG90YWwgYXNzZXRzOiA5OTksOTk5LDk5OSBjcmVkaXRz'
+                                        }
+                                    }
+                                },
+                                'admin': {
+                                    type: 'dir',
+                                    locked: true,
+                                    content: {
+                                        'master_access.key': {
+                                            type: 'file',
+                                            content: 'MASTER_KEY: FINAL_STAGE_COMPLETE'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    break;
+            }
+        }
+        
+        // Set up available commands for each level
+        function setupCommands(level) {
+            // Basic commands available in all levels
+            gameState.commands = {
+                help: {
+                    description: 'Show available commands',
+                    action: showHelp
+                },
+                ls: {
+                    description: 'List files in current directory',
+                    action: listFiles
+                },
+                cd: {
+                    description: 'Change directory',
+                    action: changeDirectory
+                },
+                cat: {
+                    description: 'Display file contents',
+                    action: showFileContent
+                },
+                clear: {
+                    description: 'Clear terminal screen',
+                    action: clearTerminal
+                }
+            };
+            
+            // Add level-specific commands
+            if (level >= 2) {
+                gameState.commands.scan = {
+                    description: 'Scan for vulnerabilities',
+                    action: scanSystem
+                };
+                gameState.commands.brute = {
+                    description: 'Attempt brute force password crack',
+                    action: bruteForce
+                };
+            }
+            
+            if (level >= 3) {
+                gameState.commands.decrypt = {
+                    description: 'Decrypt encrypted files',
+                    action: decryptFile
+                };
+                gameState.commands.access = {
+                    description: 'Attempt to gain higher access',
+                    action: gainAccess
+                };
+            }
+            
+            if (level >= 4) {
+                gameState.commands.inject = {
+                    description: 'Inject code into system',
+                    action: injectCode
+                };
+                gameState.commands.hide = {
+                    description: 'Hide your presence',
+                    action: hidePresence
+                };
+            }
+            
+            if (level >= 5) {
+                gameState.commands.override = {
+                    description: 'Override security systems',
+                    action: overrideSecurity
+                };
+                gameState.commands.extract = {
+                    description: 'Extract sensitive data',
+                    action: extractData
+                };
+            }
+        }
+        
+        // Helper function to get the current directory object
+        function getCurrentDirectory() {
+            let currentDir = gameState.fileSystem['/'];
+            const path = gameState.currentDir.split('/').filter(Boolean);
+            
+            for (const dir of path) {
+                if (currentDir.content && currentDir.content[dir]) {
+                    currentDir = currentDir.content[dir];
+                } else {
+                    return null;
+                }
+            }
+            
+            return currentDir;
+        }
+        
+        // Update terminal prompt based on current directory
+        function updatePrompt() {
+            const level = gameState.currentLevel;
+            let sys = "";
+            
+            switch(level) {
+                case 1: sys = "personal"; break;
+                case 2: sys = "corporate"; break;
+                case 3: sys = "gov"; break;
+                case 4: sys = "defense"; break;
+                case 5: sys = "megacorp"; break;
+            }
+            
+            prompt.textContent = `hacker@${sys}:${gameState.currentDir}$ `;
+        }
+        
+        // Command handlers
+        function showHelp() {
+            let helpText = `<div class="help-menu">
+                <div style="color: var(--neon-purple); margin-bottom: 10px;">AVAILABLE COMMANDS:</div>`;
+            
+            Object.entries(gameState.commands).forEach(([cmd, info]) => {
+                helpText += `<div class="help-command">
+                    <div class="command-name">${cmd}</div>
+                    <div>${info.description}</div>
+                </div>`;
+            });
+            
+            helpText += '</div>';
+            addToTerminal(helpText, 'info');
+            return true;
+        }
+        
+        function listFiles(args) {
+            const currentDir = getCurrentDirectory();
+            
+            if (!currentDir || currentDir.type !== 'dir') {
+                addToTerminal('Error: Not a valid directory', 'error');
+                return false;
+            }
+            
+            if (currentDir.locked) {
+                addToTerminal('Access denied: This directory is locked', 'error');
+                return false;
+            }
+            
+            let output = '';
+            
+            for (const [name, item] of Object.entries(currentDir.content)) {
+                const itemType = item.type === 'dir' ? 'directory' : 'file';
+                const color = item.type === 'dir' ? 'var(--neon-blue)' : 'var(--neon-green)';
+                const lockStatus = item.locked ? ' [LOCKED]' : '';
+                const encStatus = item.encrypted ? ' [ENCRYPTED]' : '';
+                
+                output += `<span style="color: ${color}">${name}</span> (${itemType})${lockStatus}${encStatus}<br>`;
+            }
+            
+            if (output === '') {
+                output = 'Directory is empty';
+            }
+            
+            addToTerminal(output, 'success');
+            return true;
+        }
+        
+        function changeDirectory(args) {
+            if (!args.length) {
+                addToTerminal('Usage: cd <directory>', 'info');
+                return false;
+            }
+            
+            const dirName = args[0];
+            
+            if (dirName === '..') {
+                // Go up one directory
+                const parts = gameState.currentDir.split('/').filter(Boolean);
+                if (parts.length > 0) {
+                    parts.pop();
+                    gameState.currentDir = '/' + parts.join('/');
+                    if (gameState.currentDir !== '/') gameState.currentDir += '/';
+                }
+                updatePrompt();
+                return true;
+            } else if (dirName === '/') {
+                // Go to root
+                gameState.currentDir = '/';
+                updatePrompt();
+                return true;
+            }
+            
+            const currentDir = getCurrentDirectory();
+            
+            if (!currentDir || currentDir.type !== 'dir') {
+                addToTerminal('Error: Current location is not a directory', 'error');
+                return false;
+            }
+            
+            if (currentDir.content && currentDir.content[dirName]) {
+                const targetDir = currentDir.content[dirName];
+                
+                if (targetDir.type !== 'dir') {
+                    addToTerminal(`Error: ${dirName} is not a directory`, 'error');
+                    return false;
+                }
+                
+                if (targetDir.locked) {
+                    addToTerminal(`Access denied: ${dirName} is locked`, 'error');
+                    return false;
+                }
+                
+                gameState.currentDir += gameState.currentDir.endsWith('/') ? dirName + '/' : '/' + dirName + '/';
+                updatePrompt();
+                return true;
+            } else {
+                addToTerminal(`Error: Directory ${dirName} not found`, 'error');
+                return false;
+            }
+        }
+        
+        function showFileContent(args) {
+            if (!args.length) {
+                addToTerminal('Usage: cat <filename>', 'info');
+                return false;
+            }
+            
+            const fileName = args[0];
+            const currentDir = getCurrentDirectory();
+            
+            if (!currentDir) {
+                addToTerminal('Error: Invalid directory', 'error');
+                return false;
+            }
+            
+            if (currentDir.content && currentDir.content[fileName]) {
+                const file = currentDir.content[fileName];
+                
+                if (file.type !== 'file') {
+                    addToTerminal(`Error: ${fileName} is not a file`, 'error');
+                    return false;
+                }
+                
+                if (file.encrypted) {
+                    addToTerminal(`Error: ${fileName} is encrypted. Use decrypt command`, 'error');
+                    return false;
+                }
+                
+                addToTerminal(`<span style="color: var(--neon-purple)">Contents of ${fileName}:</span><br>${file.content}`, 'success');
+                
+                // Level completion checks based on file content
+                checkLevelCompletion(fileName, file.content);
+                
+                return true;
+            } else {
+                addToTerminal(`Error: File ${fileName} not found`, 'error');
+                return false;
+            }
+        }
+        
+        function clearTerminal() {
+            terminalContent.innerHTML = '';
+            return true;
+        }
+        
+        // Level 2+ commands
+        function scanSystem(args) {
+            if (gameState.currentLevel < 2) {
+                addToTerminal('Command not available at your current level', 'error');
+                return false;
+            }
+            
+            addToTerminal('Scanning system for vulnerabilities...', 'info');
+            
+            // Show progress bar
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'progress-container';
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar';
+            progressContainer.appendChild(progressBar);
+            terminalContent.appendChild(progressContainer);
+            
+            // Simulate scan progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    // After scan completes, show results
+                    setTimeout(() => {
+                        let vulnerabilities = [];
+                        
+                        switch (gameState.currentLevel) {
+                            case 2:
+                                vulnerabilities = [
+                                    'Weak password protection on admin directory',
+                                    'Outdated server software version'
+                                ];
+                                break;
+                            case 3:
+                                vulnerabilities = [
+                                    'Encrypted files using standard algorithm',
+                                    'Potential access escalation vector in system directory'
+                                ];
+                                break;
+                            case 4:
+                                vulnerabilities = [
+                                    'Injection point detected in control systems',
+                                    'Outdated intrusion detection system'
+                                ];
+                                break;
+                            case 5:
+                                vulnerabilities = [
+                                    'Quantum encryption bypass possibility (0.001% chance)',
+                                    'Emergency override protocol exists'
+                                ];
+                                break;
+                        }
+                        
+                        let output = `<div style="border: 1px solid var(--neon-green); padding: 10px; margin-top: 10px;">
+                            <span style="color: var(--neon-purple)">SCAN COMPLETE</span><br>
+                            <span style="color: var(--neon-green)">Vulnerabilities detected:</span><br>`;
+                        
+                        vulnerabilities.forEach(vuln => {
+                            output += `- ${vuln}<br>`;
+                        });
+                        
+                        output += `<br><span style="color: var(--neon-blue)">Recommended action:</span> `;
+                        
+                        if (gameState.currentLevel === 2) {
+                            output += 'Use <span class="info">brute</span> command on admin directory';
+                        } else if (gameState.currentLevel === 3) {
+                            output += 'Try to <span class="info">decrypt</span> encrypted files';
+                        } else if (gameState.currentLevel === 4) {
+                            output += 'Use <span class="info">inject</span> command on control systems';
+                        } else if (gameState.currentLevel === 5) {
+                            output += 'Attempt <span class="info">override</span> on security systems';
+                        }
+                        
+                        output += '</div>';
+                        
+                        addToTerminal(output, 'success');
+                    }, 500);
+                }
+            }, 200);
+            
+            return true;
+        }
+        
+        function bruteForce(args) {
+            if (gameState.currentLevel < 2) {
+                addToTerminal('Command not available at your current level', 'error');
+                return false;
+            }
+            
+            if (!args.length) {
+                addToTerminal('Usage: brute <target>', 'info');
+                return false;
+            }
+            
+            const target = args[0];
+            
+            // Check if we're in the right directory for brute forcing
+            const currentDir = getCurrentDirectory();
+            if (!currentDir) {
+                addToTerminal('Error: Invalid directory', 'error');
+                return false;
+            }
+            
+            // Level specific targets
+            let validTarget = false;
+            let successMessage = '';
+            
+            if (gameState.currentLevel === 2 && target === 'admin' && gameState.currentDir === '/') {
+                validTarget = true;
+                successMessage = 'Successfully brute forced admin directory. Access granted.';
+                gameState.fileSystem['/'].content.admin.locked = false;
+            } else if (gameState.currentLevel >= 3) {
+                // Check directory-specific targets for higher levels
+                if (gameState.currentLevel === 3 && target === 'classified' && gameState.currentDir === '/') {
+                    validTarget = true;
+                    successMessage = 'Successfully bypassed classified directory security.';
+                    gameState.fileSystem['/'].content.classified.locked = false;
+                } else if (gameState.currentLevel === 4 && target === 'control' && gameState.currentDir === '/') {
+                    validTarget = true;
+                    successMessage = 'Control system access granted.';
+                    gameState.fileSystem['/'].content.control.locked = false;
+                } else if (gameState.currentLevel === 5) {
+                    if (target === 'vault' && gameState.currentDir === '/') {
+                        validTarget = true;
+                        successMessage = 'Vault security bypassed. Access granted.';
+                        gameState.fileSystem['/'].content.vault.locked = false;
+                    } else if (target === 'admin' && gameState.currentDir === '/') {
+                        validTarget = true;
+                        successMessage = 'Admin directory security bypassed.';
+                        gameState.fileSystem['/'].content.admin.locked = false;
+                    }
+                }
+            }
+            
+            if (!validTarget) {
+                addToTerminal(`Error: Cannot brute force ${target} from current location`, 'error');
+                return false;
+            }
+            
+            // Simulate brute force attempt
+            addToTerminal(`Attempting to brute force ${target}...`, 'info');
+            
+            // Show progress bar
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'progress-container';
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar';
+            progressContainer.appendChild(progressBar);
+            terminalContent.appendChild(progressContainer);
+            
+            // Simulate brute force progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    // Chance of failure increases with level
+                    const failChance = (gameState.currentLevel - 1) * 15;
+                    const rand = Math.random() * 100;
+                    
+                    if (rand < failChance) {
+                        gameState.passwordAttempts++;
+                        
+                        if (gameState.passwordAttempts >= gameState.maxPasswordAttempts) {
+                            addToTerminal('ALERT: Too many failed attempts! Security system activated!', 'error');
+                            setTimeout(() => {
+                                gameOver();
+                            }, 1500);
+                        } else {
+                            addToTerminal(`Brute force attempt failed. ${gameState.maxPasswordAttempts - gameState.passwordAttempts} attempts remaining before lockout.`, 'error');
+                        }
+                    } else {
+                        addToTerminal(successMessage, 'success');
+                    }
+                }
+            }, 200);
+            
+            return true;
+        }
+        
+        // Level 3+ commands
+        function decryptFile(args) {
+            if (gameState.currentLevel < 3) {
+                addToTerminal('Command not available at your current level', 'error');
+                return false;
+            }
+            
+            if (!args.length) {
+                addToTerminal('Usage: decrypt <filename>', 'info');
+                return false;
+            }
+            
+            const fileName = args[0];
+            const currentDir = getCurrentDirectory();
+            
+            if (!currentDir) {
+                addToTerminal('Error: Invalid directory', 'error');
+                return false;
+            }
+            
+            if (!currentDir.content || !currentDir.content[fileName]) {
+                addToTerminal(`Error: File ${fileName} not found`, 'error');
+                return false;
+            }
+            
+            const file = currentDir.content[fileName];
+            
+            if (file.type !== 'file') {
+                addToTerminal(`Error: ${fileName} is not a file`, 'error');
+                return false;
+            }
+            
+            if (!file.encrypted) {
+                addToTerminal(`Error: ${fileName} is not encrypted`, 'error');
+                return false;
+            }
+            
+            addToTerminal(`Attempting to decrypt ${fileName}...`, 'info');
+            
+            // Show progress bar
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'progress-container';
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar';
+            progressContainer.appendChild(progressBar);
+            terminalContent.appendChild(progressContainer);
+            
+            // Simulate decryption progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    // Decode the base64 content
+                    try {
+                        const decodedContent = atob(file.content);
+                        addToTerminal(`<span style="color: var(--neon-purple)">File decrypted:</span><br>${decodedContent}`, 'success');
+                        
+                        // Mark as decrypted
+                        file.encrypted = false;
+                        file.content = decodedContent;
+                        
+                        // Check if this completes a level objective
+                        if (gameState.currentLevel === 3 && fileName === 'access_codes.enc') {
+                            addToTerminal('<span style="color: var(--neon-blue)">You found an access code that might be useful!</span>', 'info');
+                        } else if (gameState.currentLevel === 5 && fileName === 'client_data.db') {
+                            completeLevel();
+                        }
+                    } catch (e) {
+                        addToTerminal('Decryption failed. File format corrupted.', 'error');
+                    }
+                }
+            }, 200);
+            
+            return true;
+        }
+        
+        function gainAccess(args) {
+            if (gameState.currentLevel < 3) {
+                addToTerminal('Command not available at your current level', 'error');
+                return false;
+            }
+            
+            if (args.length && args[0] === 'XZZ9975' && gameState.currentLevel === 3) {
+                addToTerminal('Access code accepted. Escalating privileges...', 'success');
+                
+                // Show progress bar
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'progress-container';
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressContainer.appendChild(progressBar);
+                terminalContent.appendChild(progressContainer);
+                
+                // Simulate process
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        addToTerminal('Privilege escalation successful! You now have admin access.', 'success');
+                        completeLevel();
+                    }
+                }, 200);
+                
+                return true;
+            } else {
+                addToTerminal('Usage: access <code> - Enter access code to gain admin privileges', 'info');
+                return false;
+            }
+        }
+        
+        // Level 4+ commands
+        function injectCode(args) {
+            if (gameState.currentLevel < 4) {
+                addToTerminal('Command not available at your current level', 'error');
+                return false;
+            }
+            
+            if (!args.length) {
+                addToTerminal('Usage: inject <target>', 'info');
+                return false;
+            }
+            
+            const target = args[0];
+            
+            // Check if we're in the right directory and targeting the right file
+            if (gameState.currentLevel === 4 && gameState.currentDir === '/control/' && target === 'main_control.sys') {
+                addToTerminal('Injecting code into main control system...', 'info');
+                
+                // Show progress bar
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'progress-container';
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressContainer.appendChild(progressBar);
+                terminalContent.appendChild(progressContainer);
+                
+                // Simulate process
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    // Add some suspense
+                    if (progress === 50) {
+                        addToTerminal('<span class="warning">WARNING: Intrusion detection system active!</span>', 'warning');
+                    }
+                    
+                    if (progress === 75) {
+                        addToTerminal('<span class="warning">ALERT: Security scan in progress!</span>', 'warning');
+                    }
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        
+                        // 50% chance of triggering alarm
+                        if (Math.random() > 0.5) {
+                            addToTerminal('CRITICAL ERROR: Injection detected! Security system alerted!', 'error');
+                            setTimeout(() => {
+                                gameOver();
+                            }, 1500);
+                        } else {
+                            addToTerminal('Code injection successful! Control system compromised.', 'success');
+                            completeLevel();
+                        }
+                    }
+                }, 200);
+                
+                return true;
+            } else if (gameState.currentLevel >= 4) {
+                addToTerminal(`Cannot inject code into ${target} from current location`, 'error');
+                return false;
+            } else {
+                addToTerminal('Command not available at your current level', 'error');
+                return false;
+            }
+        }
+        
+        function hidePresence(args) {
+            if (gameState.currentLevel < 4) {
+                addToTerminal('Command not available at your current level', 'error');
+                return false;
+            }
+            
+            addToTerminal('Activating stealth protocols...', 'info');
+            
+            // Show progress bar
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'progress-container';
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar';
+            progressContainer.appendChild(progressBar);
+            terminalContent.appendChild(progressContainer);
+            
+            // Simulate process
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    addToTerminal('Stealth mode activated. Your presence is now hidden from security systems.', 'success');
+                    
+                    // This makes the next command less likely to fail
+                    gameState.stealthActive = true;
+                }
+            }, 200);
+            
+            return true;
+        }
+        
+        // Level 5 commands
+        function overrideSecurity(args) {
+            if (gameState.currentLevel < 5) {
+                addToTerminal('Command not available at your current level', 'error');
+                return false;
+            }
+            
+            addToTerminal('Attempting to override security systems...', 'info');
+            
+            // Show progress bar
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'progress-container';
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar';
+            progressContainer.appendChild(progressBar);
+            terminalContent.appendChild(progressContainer);
+            
+            // Simulate process
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+                
+                // Add some suspense
+                if (progress === 30) {
+                    addToTerminal('<span class="warning">WARNING: Quantum security responding!</span>', 'warning');
+                }
+                
+                if (progress === 60) {
+                    addToTerminal('<span class="warning">ALERT: Neural firewall engaged!</span>', 'warning');
+                }
+                
+                if (progress === 90) {
+                    addToTerminal('<span class="warning">CRITICAL: System attempting to trace your location!</span>', 'warning');
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    // High chance of failure unless stealth is active
+                    const failChance = gameState.stealthActive ? 30 : 70;
+                    
+                    if (Math.random() * 100 < failChance) {
+                        addToTerminal('SECURITY BREACH DETECTED! Emergency protocols activated!', 'error');
+                        setTimeout(() => {
+                            gameOver();
+                        }, 1500);
+                    } else {
+                        addToTerminal('Security override successful! All systems compromised.', 'success');
+                        // Unlock all directories
+                        gameState.fileSystem['/'].content.vault.locked = false;
+                        gameState.fileSystem['/'].content.admin.locked = false;
+                    }
+                }
+            }, 200);
+            
+            return true;
+        }
+        
+        function extractData(args) {
+            if (gameState.currentLevel < 5) {
+                addToTerminal('Command not available at your current level', 'error');
+                return false;
+            }
+            
+            if (!args.length) {
+                addToTerminal('Usage: extract <target>', 'info');
+                return false;
+            }
+            
+            const target = args[0];
+            
+            // Check if we're in the right directory
+            if (gameState.currentDir === '/vault/' && target === 'client_data.db') {
+                addToTerminal('Extracting client data...', 'info');
+                
+                // Show progress bar
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'progress-container';
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressContainer.appendChild(progressBar);
+                terminalContent.appendChild(progressContainer);
+                
+                // Simulate process
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        addToTerminal('Data extraction complete! Mission accomplished.', 'success');
+                        completeLevel();
+                    }
+                }, 200);
+                
+                return true;
+            } else {
+                addToTerminal(`Cannot extract data from ${target} in current location`, 'error');
+                return false;
+            }
+        }
+        
+        // Handle input from user
+        function handleInput(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const command = userInput.value.trim();
+                
+                if (command) {
+                    // Add command to terminal
+                    addToTerminal(`<span class="prompt">${prompt.textContent}</span> ${command}`, 'command');
+                    
+                    // Process command
+                    processCommand(command);
+                    
+                    // Clear input
+                    userInput.value = '';
+                    
+                    // Scroll to bottom
+                    terminalContent.scrollTop = terminalContent.scrollHeight;
+                }
+            }
+        }
+        
+        // Process user command
+        function processCommand(commandString) {
+            const parts = commandString.split(' ');
+            const command = parts[0].toLowerCase();
+            const args = parts.slice(1);
+            
+            if (gameState.commands[command]) {
+                gameState.commands[command].action(args);
+            } else {
+                addToTerminal(`Error: Command not found: ${command}`, 'error');
+            }
+            
+            // Auto-scroll to bottom
+            terminalContent.scrollTop = terminalContent.scrollHeight;
+        }
+        
+        // Add content to terminal
+        function addToTerminal(content, type = '') {
+            const response = document.createElement('div');
+            response.className = `response ${type}`;
+            response.innerHTML = content;
+            terminalContent.appendChild(response);
+            
+            // Scroll to bottom
+            terminalContent.scrollTop = terminalContent.scrollHeight;
+        }
+        
+        // Show info for current level
+        function showLevelInfo(level) {
+            let levelInfo = '';
+            
+            switch(level) {
+                case 1:
+                    levelInfo = `
+                    <div class="level-info">
+                        <span style="color: var(--neon-purple)">LEVEL 1: PERSONAL SERVER</span><br>
+                        <span style="color: var(--neon-blue)">Objective:</span> Explore the system and find the admin credentials.<br>
+                        <span style="color: var(--neon-blue)">Available Commands:</span> help, ls, cd, cat, clear<br>
+                        <span style="color: var(--neon-blue)">Hint:</span> Use <span class="info">ls</span> to list files and directories, <span class="info">cd</span> to change directories, and <span class="info">cat</span> to view file contents.
+                    </div>`;
+                    break;
+                case 2:
+                    levelInfo = `
+                    <div class="level-info">
+                        <span style="color: var(--neon-purple)">LEVEL 2: CORPORATE NETWORK</span><br>
+                        <span style="color: var(--neon-blue)">Objective:</span> Break into the admin directory and find sensitive information.<br>
+                        <span style="color: var(--neon-blue)">New Commands:</span> scan, brute<br>
+                        <span style="color: var(--neon-blue)">Hint:</span> Use <span class="info">scan</span> to find vulnerabilities, then <span class="info">brute</span> to force your way in.
+                    </div>`;
+                    break;
+                case 3:
+                    levelInfo = `
+                    <div class="level-info">
+                        <span style="color: var(--neon-purple)">LEVEL 3: GOVERNMENT DATABASE</span><br>
+                        <span style="color: var(--neon-blue)">Objective:</span> Decrypt classified files and escalate your privileges.<br>
+                        <span style="color: var(--neon-blue)">New Commands:</span> decrypt, access<br>
+                        <span style="color: var(--neon-blue)">Hint:</span> Look for encrypted files with sensitive information, then use access codes to gain higher privileges.
+                    </div>`;
+                    break;
+                case 4:
+                    levelInfo = `
+                    <div class="level-info">
+                        <span style="color: var(--neon-purple)">LEVEL 4: DEFENSE SYSTEM</span><br>
+                        <span style="color: var(--neon-blue)">Objective:</span> Inject code into the security system without being detected.<br>
+                        <span style="color: var(--neon-blue)">New Commands:</span> inject, hide<br>
+                        <span style="color: var(--neon-blue)">Hint:</span> Use <span class="info">hide</span> to increase your chances of avoiding detection before attempting to <span class="info">inject</span> code.
+                    </div>`;
+                    break;
+                case 5:
+                    levelInfo = `
+                    <div class="level-info">
+                        <span style="color: var(--neon-purple)">LEVEL 5: MEGACORP SECURITY</span><br>
+                        <span style="color: var(--neon-blue)">Objective:</span> Override security and extract sensitive client data.<br>
+                        <span style="color: var(--neon-blue)">New Commands:</span> override, extract<br>
+                        <span style="color: var(--neon-blue)">Hint:</span> This system has multiple layers of security. Navigate carefully and use all your skills.
+                    </div>`;
+                    break;
+            }
+            
+            addToTerminal(levelInfo, 'info');
+        }
+        
+        // Level completion check
+        function checkLevelCompletion(fileName, content) {
+            // Level specific victory conditions
+            switch(gameState.currentLevel) {
+                case 1:
+                    if (fileName === 'users.db' && gameState.currentDir === '/system/') {
+                        addToTerminal('<span style="color: var(--neon-green)">You found the admin credentials!</span>', 'success');
+                        completeLevel();
+                    }
+                    break;
+                case 2:
+                    if (fileName === 'users.db' && gameState.currentDir === '/admin/') {
+                        addToTerminal('<span style="color: var(--neon-green)">You\'ve successfully accessed sensitive admin data!</span>', 'success');
+                        completeLevel();
+                    }
+                    break;
+                // Level 3 & 4 are handled in their specific command functions
+            }
+        }
+        
+        // Complete current level
+        function completeLevel() {
+            // Check if this is the final level
+            if (gameState.currentLevel >= gameState.maxLevel) {
+                gameVictory();
+                return;
+            }
+            
+            // Show level completion modal
+            modalTitle.textContent = `LEVEL ${gameState.currentLevel} COMPLETE`;
+            modalMessage.textContent = `You've successfully completed Level ${gameState.currentLevel}!`;
+            levelModal.style.display = 'flex';
+        }
+        
+        // Go to next level
+        function nextLevel() {
+            levelModal.style.display = 'none';
+            setupLevel(gameState.currentLevel + 1);
+            clearTerminal();
+            showLevelInfo(gameState.currentLevel);
+        }
+        
+        // Game over
+        function gameOver() {
+            statusDisplay.textContent = "DISCONNECTED";
+            statusDisplay.className = "error";
+            gameOverModal.style.display = 'flex';
+        }
+        
+        // Retry current level
+        function retryLevel() {
+            gameOverModal.style.display = 'none';
+            setupLevel(gameState.currentLevel);
+            clearTerminal();
+            showLevelInfo(gameState.currentLevel);
+        }
+        
+        // Victory
+        function gameVictory() {
+            statusDisplay.textContent = "MISSION COMPLETE";
+            statusDisplay.className = "success";
+            victoryModal.style.display = 'flex';
+        }
+        
+        // Restart game
+        function restartGame() {
+            victoryModal.style.display = 'none';
+            setupLevel(1);
+            clearTerminal();
+            
+            // Welcome message
+            addToTerminal(`
+            <div class="intro">
+                <span style="color: var(--neon-purple); font-size: 1.5rem;">NEON HACKER TERMINAL v1.0</span>
+                <span style="color: var(--neon-red);">[UNAUTHORIZED ACCESS]</span>
+            
+                Welcome to the underground network, hacker. Your journey into the depths of the digital world begins now.
+                Each level will challenge your skills and intuition as you navigate increasingly secure systems.
+                
+                Type <span class="info">help</span> to see available commands.
+                
+                REMEMBER: Stay under the radar. Too many failed attempts will trigger security protocols.
+            </div>`, 'intro');
+            
+            // Level info
+            showLevelInfo(1);
+        }
+        
+        // Initialize the game when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>

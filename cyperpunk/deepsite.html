@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Hacker Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #0a0a0a;
+            color: #0f0;
+            overflow: hidden;
+        }
+        
+        .terminal {
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 1px solid #0f0;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            text-shadow: 0 0 5px #0f0;
+        }
+        
+        .cursor {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00fff9;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim-2 2s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(32px, 9999px, 28px, 0); }
+            10% { clip: rect(13px, 9999px, 37px, 0); }
+            20% { clip: rect(45px, 9999px, 33px, 0); }
+            30% { clip: rect(31px, 9999px, 94px, 0); }
+            40% { clip: rect(88px, 9999px, 98px, 0); }
+            50% { clip: rect(9px, 9999px, 98px, 0); }
+            60% { clip: rect(37px, 9999px, 17px, 0); }
+            70% { clip: rect(77px, 9999px, 53px, 0); }
+            80% { clip: rect(55px, 9999px, 49px, 0); }
+            90% { clip: rect(10px, 9999px, 2px, 0); }
+            100% { clip: rect(35px, 9999px, 53px, 0); }
+        }
+        
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(65px, 9999px, 119px, 0); }
+            10% { clip: rect(79px, 9999px, 66px, 0); }
+            20% { clip: rect(148px, 9999px, 115px, 0); }
+            30% { clip: rect(118px, 9999px, 30px, 0); }
+            40% { clip: rect(184px, 9999px, 122px, 0); }
+            50% { clip: rect(172px, 9999px, 50px, 0); }
+            60% { clip: rect(119px, 9999px, 74px, 0); }
+            70% { clip: rect(20px, 9999px, 81px, 0); }
+            80% { clip: rect(151px, 9999px, 131px, 0); }
+            90% { clip: rect(131px, 9999px, 73px, 0); }
+            100% { clip: rect(59px, 9999px, 87px, 0); }
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #0f0, #0a0);
+            transition: width 0.3s;
+        }
+        
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: rgba(0, 255, 0, 0.1);
+            animation: scan 8s linear infinite;
+            z-index: 10;
+        }
+        
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        
+        .matrix-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body class="bg-black text-green-500 h-screen flex items-center justify-center p-4">
+    <div class="matrix-rain" id="matrixRain"></div>
+    <div class="terminal w-full max-w-4xl h-5/6 rounded-lg p-4 relative overflow-hidden">
+        <div class="scanline"></div>
+        <div class="h-full flex flex-col">
+            <div class="flex items-center mb-4">
+                <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500 mr-4"></div>
+                <div class="text-sm">NEON_HACKER_TERMINAL v2.4.7</div>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto mb-4" id="terminalOutput">
+                <div class="glitch mb-4" data-text="NEON HACKER TERMINAL">
+                    <h1 class="text-2xl font-bold">NEON HACKER TERMINAL</h1>
+                </div>
+                <p class="mb-2">> Initializing system...</p>
+                <p class="mb-2">> Loading cyber modules...</p>
+                <p class="mb-2">> Establishing secure connection...</p>
+                <p class="mb-4">> System ready. Type 'help' for available commands.</p>
+                <p class="mb-2">> Current security level: <span id="currentLevel" class="font-bold">1</span></p>
+                <p class="mb-4">> Objective: <span id="currentObjective" class="font-bold">Hack into personal server</span></p>
+                <p class="mb-4">> Available commands: help, ls, cd, cat, scan, brute, decrypt, inject, hack</p>
+                <div class="mb-2 flex items-center">
+                    <span class="mr-2">root@neon-terminal:~$</span>
+                    <input type="text" id="commandInput" class="bg-transparent border-none outline-none flex-1" autofocus>
+                    <span class="cursor">|</span>
+                </div>
+            </div>
+            
+            <div class="hidden" id="levelComplete">
+                <div class="bg-black border border-green-500 p-4 mb-4">
+                    <h2 class="text-xl font-bold mb-2">LEVEL <span id="completedLevel"></span> COMPLETE!</h2>
+                    <p class="mb-2">> Access granted to next security tier</p>
+                    <p class="mb-4">> Preparing next challenge...</p>
+                    <button id="nextLevelBtn" class="bg-green-900 text-green-400 px-4 py-2 rounded hover:bg-green-800">PROCEED TO LEVEL <span id="nextLevel"></span></button>
+                </div>
+            </div>
+            
+            <div class="hidden" id="gameComplete">
+                <div class="bg-black border border-green-500 p-4 mb-4">
+                    <h2 class="text-xl font-bold mb-2">MISSION ACCOMPLISHED!</h2>
+                    <p class="mb-2">> You've successfully hacked the mainframe</p>
+                    <p class="mb-4">> All systems under your control</p>
+                    <button id="restartGameBtn" class="bg-green-900 text-green-400 px-4 py-2 rounded hover:bg-green-800">RESTART GAME</button>
+                </div>
+            </div>
+            
+            <div class="flex items-center text-xs">
+                <div class="mr-4">CONNECTION: <span class="text-green-400">SECURE</span></div>
+                <div class="mr-4">ENCRYPTION: <span class="text-green-400">ACTIVE</span></div>
+                <div>STATUS: <span id="status" class="text-green-400">READY</span></div>
+                <div class="ml-auto">[<span id="timer">00:00</span>]</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            currentLevel: 1,
+            levels: [
+                {
+                    name: "Nhập môn",
+                    objective: "Hack vào hệ thống đơn giản (server cá nhân)",
+                    commands: ["help", "ls", "cd", "cat"],
+                    solution: ["ls", "cd server", "cat password.txt"],
+                    files: {
+                        "server": {
+                            "password.txt": "admin123"
+                        }
+                    },
+                    intro: [
+                        "> Bắt đầu cấp độ 1 - Nhập môn",
+                        "> Mục tiêu: Hack vào server cá nhân",
+                        "> Sử dụng các lệnh cơ bản để tìm mật khẩu",
+                        "> Gợi ý: Dùng 'ls' để xem thư mục, 'cd' để di chuyển, 'cat' để đọc file"
+                    ]
+                },
+                {
+                    name: "Tấn công cơ bản",
+                    objective: "Brute force phá mật khẩu admin",
+                    commands: ["help", "ls", "cd", "cat", "scan", "brute"],
+                    solution: ["scan", "brute admin 123456 654321 password123"],
+                    files: {},
+                    intro: [
+                        "> Cấp độ 2 - Tấn công cơ bản",
+                        "> Mục tiêu: Tìm lỗ hổng và brute force mật khẩu admin",
+                        "> Sử dụng 'scan' để tìm lỗ hổng",
+                        "> Sử dụng 'brute [username] [pass1] [pass2] ...' để thử mật khẩu"
+                    ]
+                },
+                {
+                    name: "Giải mã & leo thang",
+                    objective: "Giải mã file quan trọng để leo thang đặc quyền",
+                    commands: ["help", "ls", "cd", "cat", "decrypt"],
+                    solution: ["ls", "cd secret", "decrypt data.enc AES 1984"],
+                    files: {
+                        "secret": {
+                            "data.enc": "U2FsdGVkX19YDF3zJ6Z7T1oJ+4dQbDpkL0DpNjX6T4w=" // "topsecret" encrypted with AES key "1984"
+                        }
+                    },
+                    intro: [
+                        "> Cấp độ 3 - Giải mã & leo thang",
+                        "> Mục tiêu: Giải mã file quan trọng để leo thang đặc quyền",
+                        "> Sử dụng 'decrypt [file] [algorithm] [key]' để giải mã",
+                        "> Gợi ý: Thuật toán AES, chìa khóa là năm Orwell"
+                    ]
+                },
+                {
+                    name: "Tấn công nâng cao",
+                    objective: "Inject mã độc để kiểm soát server",
+                    commands: ["help", "ls", "cd", "cat", "inject"],
+                    solution: ["inject payload.js", "inject --bypass"],
+                    files: {},
+                    intro: [
+                        "> Cấp độ 4 - Tấn công nâng cao",
+                        "> Mục tiêu: Inject mã độc để kiểm soát server",
+                        "> Sử dụng 'inject [file]' để chèn mã",
+                        "> Hệ thống phát hiện sẽ chặn bạn - cần bypass",
+                        "> Gợi ý: Thử inject với tùy chọn bypass"
+                    ]
+                },
+                {
+                    name: "Tổng tấn công",
+                    objective: "Hack vào hệ thống bảo mật cao (ngân hàng)",
+                    commands: ["help", "ls", "cd", "cat", "hack"],
+                    solution: ["hack --target bank --method SQLi", "hack --exploit zero-day"],
+                    files: {},
+                    intro: [
+                        "> CẤP ĐỘ CUỐI - Tổng tấn công",
+                        "> Mục tiêu: Hack vào hệ thống ngân hàng bảo mật cao",
+                        "> Sử dụng 'hack' với các tùy chọn phù hợp",
+                        "> Gợi ý: Cần kết hợp nhiều phương pháp tấn công",
+                        "> Cảnh báo: Tỉ lệ thất bại cao!"
+                    ]
+                }
+            ],
+            currentCommandIndex: 0,
+            timer: 0,
+            timerInterval: null
+        };
+
+        // DOM elements
+        const terminalOutput = document.getElementById('terminalOutput');
+        const commandInput = document.getElementById('commandInput');
+        const currentLevel = document.getElementById('currentLevel');
+        const currentObjective = document.getElementById('currentObjective');
+        const status = document.getElementById('status');
+        const levelComplete = document.getElementById('levelComplete');
+        const completedLevel = document.getElementById('completedLevel');
+        const nextLevel = document.getElementById('nextLevel');
+        const nextLevelBtn = document.getElementById('nextLevelBtn');
+        const gameComplete = document.getElementById('gameComplete');
+        const restartGameBtn = document.getElementById('restartGameBtn');
+        const timer = document.getElementById('timer');
+
+        // Initialize game
+        function initGame() {
+            gameState.currentLevel = 1;
+            gameState.currentCommandIndex = 0;
+            gameState.timer = 0;
+            
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(updateTimer, 1000);
+            
+            currentLevel.textContent = gameState.currentLevel;
+            currentObjective.textContent = gameState.levels[gameState.currentLevel - 1].objective;
+            
+            terminalOutput.innerHTML = `
+                <div class="glitch mb-4" data-text="NEON HACKER TERMINAL">
+                    <h1 class="text-2xl font-bold">NEON HACKER TERMINAL</h1>
+                </div>
+                <p class="mb-2">> Initializing system...</p>
+                <p class="mb-2">> Loading cyber modules...</p>
+                <p class="mb-2">> Establishing secure connection...</p>
+                <p class="mb-4">> System ready. Type 'help' for available commands.</p>
+                <p class="mb-2">> Current security level: <span class="font-bold">${gameState.currentLevel}</span></p>
+                <p class="mb-4">> Objective: <span class="font-bold">${gameState.levels[gameState.currentLevel - 1].objective}</span></p>
+                <p class="mb-4">> Available commands: ${gameState.levels[gameState.currentLevel - 1].commands.join(", ")}</p>
+            `;
+            
+            // Add level intro
+            gameState.levels[gameState.currentLevel - 1].intro.forEach(line => {
+                addOutput(line);
+            });
+            
+            addCommandLine();
+            
+            levelComplete.classList.add('hidden');
+            gameComplete.classList.add('hidden');
+        }
+
+        // Update timer
+        function updateTimer() {
+            gameState.timer++;
+            const minutes = Math.floor(gameState.timer / 60).toString().padStart(2, '0');
+            const seconds = (gameState.timer % 60).toString().padStart(2, '0');
+            timer.textContent = `${minutes}:${seconds}`;
+        }
+
+        // Add command line to terminal
+        function addCommandLine() {
+            const commandLine = document.createElement('div');
+            commandLine.className = 'mb-2 flex items-center';
+            commandLine.innerHTML = `
+                <span class="mr-2">root@neon-terminal:~$</span>
+                <input type="text" id="commandInput" class="bg-transparent border-none outline-none flex-1" autofocus>
+                <span class="cursor">|</span>
+            `;
+            terminalOutput.appendChild(commandLine);
+            
+            const input = commandLine.querySelector('input');
+            input.focus();
+            
+            input.addEventListener('keydown', handleCommand);
+        }
+
+        // Add output to terminal
+        function addOutput(text, isError = false) {
+            const output = document.createElement('p');
+            output.className = `mb-2 ${isError ? 'text-red-500' : ''}`;
+            output.textContent = text;
+            terminalOutput.appendChild(output);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+
+        // Handle command input
+        function handleCommand(e) {
+            if (e.key === 'Enter') {
+                const command = e.target.value.trim();
+                addOutput(`root@neon-terminal:~$ ${command}`);
+                
+                processCommand(command);
+                
+                e.target.value = '';
+            }
+        }
+
+        // Process command
+        function processCommand(command) {
+            const currentLevelData = gameState.levels[gameState.currentLevel - 1];
+            
+            // Check if command is valid for this level
+            if (!currentLevelData.commands.includes(command.split(' ')[0]) && command !== '') {
+                addOutput(`> Error: Command not recognized or not available at this level`, true);
+                addCommandLine();
+                return;
+            }
+            
+            // Check if command matches solution
+            if (command === currentLevelData.solution[gameState.currentCommandIndex]) {
+                gameState.currentCommandIndex++;
+                
+                // Execute command
+                executeCommand(command);
+                
+                // Check if level is complete
+                if (gameState.currentCommandIndex >= currentLevelData.solution.length) {
+                    completeLevel();
+                } else {
+                    addCommandLine();
+                }
+            } else {
+                // 30% chance of detection in level 4
+                if (gameState.currentLevel === 4 && Math.random() < 0.3) {
+                    addOutput("> WARNING: Intrusion detected! Security systems activated.", true);
+                    addOutput("> Connection terminated.", true);
+                    addOutput("> Re-establishing connection...");
+                    setTimeout(() => {
+                        addOutput("> Connection restored. Try again.");
+                        addCommandLine();
+                    }, 2000);
+                } else {
+                    // 20% chance of failure in level 5
+                    if (gameState.currentLevel === 5 && Math.random() < 0.2) {
+                        addOutput("> ERROR: Exploit failed! System defenses activated.", true);
+                        addOutput("> Your attack was detected and blocked.", true);
+                        addOutput("> Modifying approach...");
+                        setTimeout(() => {
+                            addOutput("> Ready for next attempt.");
+                            addCommandLine();
+                        }, 2000);
+                    } else {
+                        addOutput("> Command executed but didn't produce expected result", true);
+                        addCommandLine();
+                    }
+                }
+            }
+        }
+
+        // Execute command
+        function executeCommand(command) {
+            const parts = command.split(' ');
+            const cmd = parts[0];
+            const args = parts.slice(1);
+            
+            switch (cmd) {
+                case 'help':
+                    addOutput("> Available commands: " + gameState.levels[gameState.currentLevel - 1].commands.join(", "));
+                    break;
+                    
+                case 'ls':
+                    if (args.length === 0) {
+                        const files = Object.keys(gameState.levels[gameState.currentLevel - 1].files);
+                        if (files.length > 0) {
+                            addOutput("> " + files.join(" "));
+                        } else {
+                            addOutput("> No files or directories found");
+                        }
+                    } else {
+                        addOutput("> ls: invalid option", true);
+                    }
+                    break;
+                    
+                case 'cd':
+                    if (args.length === 1) {
+                        const dir = args[0];
+                        if (dir in gameState.levels[gameState.currentLevel - 1].files) {
+                            addOutput(`> Changed directory to ${dir}`);
+                        } else {
+                            addOutput(`> cd: ${dir}: No such directory`, true);
+                        }
+                    } else {
+                        addOutput("> cd: invalid option", true);
+                    }
+                    break;
+                    
+                case 'cat':
+                    if (args.length === 1) {
+                        const file = args[0];
+                        let found = false;
+                        
+                        // Search for file in current level's files
+                        for (const dir in gameState.levels[gameState.currentLevel - 1].files) {
+                            if (file in gameState.levels[gameState.currentLevel - 1].files[dir]) {
+                                addOutput("> " + gameState.levels[gameState.currentLevel - 1].files[dir][file]);
+                                found = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!found) {
+                            addOutput(`> cat: ${file}: No such file`, true);
+                        }
+                    } else {
+                        addOutput("> cat: invalid option", true);
+                    }
+                    break;
+                    
+                case 'scan':
+                    addOutput("> Scanning for vulnerabilities...");
+                    setTimeout(() => {
+                        addOutput("> Found weak authentication on admin portal");
+                    }, 1000);
+                    break;
+                    
+                case 'brute':
+                    if (args.length >= 2) {
+                        addOutput("> Attempting brute force attack...");
+                        setTimeout(() => {
+                            if (args.includes("password123")) {
+                                addOutput("> Success! Password found: password123");
+                            } else {
+                                addOutput("> Failed to find password in provided list", true);
+                            }
+                        }, 1500);
+                    } else {
+                        addOutput("> brute: requires username and at least one password", true);
+                    }
+                    break;
+                    
+                case 'decrypt':
+                    if (args.length === 3) {
+                        addOutput(`> Decrypting ${args[0]} with ${args[1]}...`);
+                        setTimeout(() => {
+                            if (args[1] === "AES" && args[2] === "1984") {
+                                addOutput("> Decryption successful!");
+                                addOutput("> File contents: topsecret");
+                            } else {
+                                addOutput("> Decryption failed - wrong algorithm or key", true);
+                            }
+                        }, 2000);
+                    } else {
+                        addOutput("> decrypt: requires file, algorithm and key", true);
+                    }
+                    break;
+                    
+                case 'inject':
+                    if (args.length === 1 && args[0] === "payload.js") {
+                        addOutput("> Injecting payload...");
+                        setTimeout(() => {
+                            addOutput("> WARNING: Security systems detected the payload!", true);
+                            addOutput("> Connection may be terminated...");
+                        }, 1500);
+                    } else if (args.length === 1 && args[0] === "--bypass") {
+                        addOutput("> Bypassing security systems...");
+                        setTimeout(() => {
+                            addOutput("> Security bypassed! Payload injected successfully");
+                        }, 2000);
+                    } else {
+                        addOutput("> inject: invalid option", true);
+                    }
+                    break;
+                    
+                case 'hack':
+                    if (args.length === 2 && args[0] === "--target" && args[1] === "bank") {
+                        addOutput("> Targeting bank mainframe...");
+                        setTimeout(() => {
+                            addOutput("> Firewall detected! Need to find exploit...");
+                        }, 1500);
+                    } else if (args.length === 2 && args[0] === "--method" && args[1] === "SQLi") {
+                        addOutput("> Attempting SQL injection...");
+                        setTimeout(() => {
+                            addOutput("> Partial access gained but not enough...");
+                        }, 1500);
+                    } else if (args.length === 2 && args[0] === "--exploit" && args[1] === "zero-day") {
+                        addOutput("> Deploying zero-day exploit...");
+                        setTimeout(() => {
+                            addOutput("> EXPLOIT SUCCESSFUL!");
+                            addOutput("> Bank systems compromised!");
+                        }, 2000);
+                    } else {
+                        addOutput("> hack: invalid option", true);
+                    }
+                    break;
+                    
+                default:
+                    addOutput(`> ${command}: command not found`, true);
+            }
+        }
+
+        // Complete current level
+        function completeLevel() {
+            clearInterval(gameState.timerInterval);
+            
+            if (gameState.currentLevel < gameState.levels.length) {
+                // Show level complete screen
+                completedLevel.textContent = gameState.currentLevel;
+                nextLevel.textContent = gameState.currentLevel + 1;
+                levelComplete.classList.remove('hidden');
+                
+                // Scroll to bottom
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            } else {
+                // Game complete
+                gameComplete.classList.remove('hidden');
+                
+                // Scroll to bottom
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        }
+
+        // Start next level
+        function startNextLevel() {
+            gameState.currentLevel++;
+            gameState.currentCommandIndex = 0;
+            
+            currentLevel.textContent = gameState.currentLevel;
+            currentObjective.textContent = gameState.levels[gameState.currentLevel - 1].objective;
+            
+            levelComplete.classList.add('hidden');
+            
+            // Add level intro
+            gameState.levels[gameState.currentLevel - 1].intro.forEach(line => {
+                addOutput(line);
+            });
+            
+            addCommandLine();
+            
+            // Restart timer
+            gameState.timer = 0;
+            gameState.timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        // Event listeners
+        nextLevelBtn.addEventListener('click', startNextLevel);
+        restartGameBtn.addEventListener('click', initGame);
+
+        // Matrix rain effect
+        function initMatrixRain() {
+            const canvas = document.createElement('canvas');
+            canvas.id = 'matrixCanvas';
+            document.getElementById('matrixRain').appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = document.getElementById('matrixRain').clientWidth;
+            canvas.height = document.getElementById('matrixRain').clientHeight;
+            
+            // Matrix characters
+            const matrix = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            
+            // Set drops
+            const drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1;
+            }
+            
+            // Draw characters
+            function draw() {
+                // Black background with opacity
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Green text
+                ctx.fillStyle = '#0f0';
+                ctx.font = fontSize + 'px monospace';
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const text = matrix.charAt(Math.floor(Math.random() * matrix.length));
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    drops[i]++;
+                }
+            }
+            
+            setInterval(draw, 33);
+        }
+
+        // Initialize game and effects
+        window.addEventListener('load', () => {
+            initGame();
+            initMatrixRain();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('matrixCanvas');
+            if (canvas) {
+                canvas.width = document.getElementById('matrixRain').clientWidth;
+                canvas.height = document.getElementById('matrixRain').clientHeight;
+            }
+        });
+    </script>
+</body>
+</html>

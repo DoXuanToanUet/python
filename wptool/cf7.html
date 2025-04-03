@@ -5,11 +5,18 @@
   <title>CF7 Layout Builder – Full width, 1/2, 1/3, 1/4 with Enhanced Settings</title>
   <style>
     /* ---------- Basic Styles ---------- */
+    :root {
+      --toanwebcf7-bg-color: #facc15;
+      --toanwebcf7-text-color: #333;
+      --toanwebcf7-border-color: #ccc;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 20px;
       line-height: 1.6;
-      background: #f2f2f2;
+      background: #fff;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
     }
     h4 {
       margin-bottom: 5px;
@@ -24,59 +31,107 @@
       position: relative;
       border: 1px solid #ccc;
       background: #fff;
-      height: 350px;
+      min-height: 350px;
       margin-top: 20px;
+      border-radius: 6px;
       overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    /* Vùng chứa các field */
+    #cf7_fields_container {
+      position: relative;
+    }
+    /* Phần copyright tĩnh */
+    #cf7_layout_generator .copyright {
+      position: absolute;
+      bottom: 5px;
+      width: 100%;
+      text-align: center;
+      font-size: 16px;
+      color: #666;
+      pointer-events: none;
     }
     /* ---------- Field Styles ---------- */
     .cf7-field {
       position: absolute;
-      border: 1px solid #bbb;
-      background: #fafafa;
-      padding: 5px;
+      background: #f4f5f7;
       box-sizing: border-box;
       user-select: none;
       cursor: move;
       transition: box-shadow 0.2s;
-    }
-    .cf7-field:hover {
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 15px;
+      align-items: center;
     }
     .cf7-field .field-controls {
       font-size: 12px;
       margin-bottom: 3px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
     }
     .cf7-field .field-controls select {
-      margin-right: 5px;
-      padding: 2px 4px;
+      display: block;
+      width: 100%;
+      padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23495057' d='M2 0L0 2h4L2 0zM2 5l2-2H0l2 2z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 8px 10px;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+    .cf7-field .field-controls select:focus {
+      border-color: #80bdff;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
     }
     .cf7-field .delete-btn {
       cursor: pointer;
-      color: #e74c3c;
-      font-weight: bold;
+      background: #f2696d;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 25px;
+      height: 25px;
     }
     .cf7-field .field-label {
       font-weight: bold;
       text-align: center;
       color: #333;
+      white-space: nowrap;
+      padding-left: 15px;
+      font-size: 14px;
     }
-    /* ---------- Add Field Button ---------- */
-    .cf7-canvas__add {
+    /* ---------- Add/Reset Field Buttons ---------- */
+    .buttons {
       margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .buttons button {
       padding: 8px 15px;
-      background: #3498db;
-      color: #fff;
+      background: var(--toanwebcf7-bg-color);
+      color: #000;
       border: none;
       cursor: pointer;
-      border-radius: 3px;
-      transition: background 0.2s;
+      border-radius: 6px;
+      font-size: 18px;
+      transition: opacity 0.2s;
     }
-    .cf7-canvas__add:hover {
-      background: #2980b9;
+    .buttons button:hover {
+      opacity: 0.8;
     }
     /* ---------- Tooltip ---------- */
     .tooltip {
@@ -93,10 +148,9 @@
     /* ---------- Preview Result Styles ---------- */
     .cf7-result {
       margin-top: 20px;
-      border: 1px solid #ccc;
-      background: #fff;
-      padding: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: #f4f5f7;
+      padding: 30px;
+      border-radius: 6px;
     }
     .cf7-result__heading {
       display: flex;
@@ -111,35 +165,50 @@
       display: flex;
     }
     .cf7-result__tabs-item {
-      margin-right: 10px;
       padding: 5px 10px;
-      border: 1px solid #ccc;
       cursor: pointer;
       background: #f9f9f9;
     }
     .cf7-result__tabs-item.item-active {
-      background: #e9e9e9;
+      background: #0dc167;
       font-weight: bold;
+      color: #fff;
+    }
+    .cf7-settings {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
     }
     .cf7-settings__field {
-      margin-right: 15px;
       font-size: 13px;
     }
     .cf7-settings__field input {
-      padding: 3px 5px;
+      display: block;
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
       width: 70px;
-      border: 1px solid #ccc;
-      border-radius: 2px;
     }
-    .cf7-settings__field.label {
-      margin-right: 5px;
+    .cf7-settings__field input:focus {
+      color: #495057;
+      background-color: #fff;
+      border-color: #80bdff;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
     }
     .cf7-actions {
       position: relative;
     }
     .cf7-actions button {
       padding: 5px 10px;
-      background: #27ae60;
+      background: #0dc167;
       color: #fff;
       border: none;
       border-radius: 3px;
@@ -149,15 +218,14 @@
     .cf7-actions button:hover {
       background: #1e8449;
     }
-    .cf7-result__html pre,
-    .cf7-result__css pre {
-      background: #2c3e50;
-      color: #ecf0f1;
-      padding: 10px;
-      overflow: auto;
-      font-size: 14px;
-      line-height: 1.4;
-    }
+    .cf7-result__html pre, .cf7-result__css pre {
+    color: #932F19;
+    font-size: 13px;
+    padding: 10px;
+    border: 1px dotted #932F19;
+    background: #FDEAD7;
+    border-radius: 6px;
+}
   </style>
 </head>
 <body>
@@ -166,32 +234,47 @@
     <h4>Instructions:</h4>
     <div class="Instructions" style="margin-left: 15px">
       <ol>
-        <li>Click <b>Add Field</b> to add a new field (default is Full width, added below the last field).</li>
-        <li>Drag &amp; drop fields to arrange them. Change width using the dropdown inside each field.</li>
-        <li>You can delete a field using the &times; button.</li>
-        <li>The HTML/CSS preview updates automatically as you modify the layout.</li>
-        <li>In the CSS settings, use “Gap” instead of gutter and enter a custom Padding value (e.g. “15px 15px 15px 15px”).</li>
-        <li>Copy the generated code for use in your Contact Form 7.</li>
+        <li>Click <b>Add Field</b> để thêm field mới (mặc định là Full width, được thêm bên dưới field cuối cùng).</li>
+        <li>Drag &amp; drop field để sắp xếp. Thay đổi width qua dropdown bên trong mỗi field.</li>
+        <li>Bấm nút <b>Reset Fields</b> để xóa tất cả field và khôi phục lại mặc định.</li>
+        <li>Preview HTML/CSS được cập nhật tự động khi bạn thay đổi layout.</li>
+        <li>Sao chép code đã tạo để dùng trong Contact Form 7.</li>
       </ol>
     </div>
     
     <!-- Layout Generator Canvas -->
     <div id="cf7_layout_generator">
-      <!-- One sample field (default: Full width) -->
-      <div class="cf7-field" data-size="full" style="left: 5px; top: 5px; width: 98%; height: 48px;">
-        <div class="field-controls">
-          <select class="size-selector">
-            <option value="full" selected>Full</option>
-            <option value="1/2">1/2</option>
-            <option value="1/3">1/3</option>
-            <option value="1/4">1/4</option>
-          </select>
-          <span class="delete-btn" title="Delete Field">&times;</span>
+      <!-- Vùng chứa các field -->
+      <div id="cf7_fields_container">
+        <!-- Field mẫu ban đầu -->
+        <div class="cf7-field" data-size="full" style="left: 5px; top: 5px; width: 98%; height: 48px;">
+          <div class="field-controls">
+            <select class="size-selector">
+              <option value="full" selected>Full</option>
+              <option value="1/2">1/2</option>
+              <option value="1/3">1/3</option>
+              <option value="1/4">1/4</option>
+            </select>
+            <div class="field-label">CF7 Field: <b>Full</b></div>
+          </div>
+          <span class="delete-btn" title="Delete Field">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+              <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+            </svg>
+          </span>
         </div>
-        <div class="field-label">CF7 Field: <b>Full</b></div>
+      </div>
+      <!-- Phần copyright tĩnh -->
+      <div class="copyright">
+        1 sản phẩm phát triển bởi <a href="https://doxuantoan.com" target="_blank">ToanWeb (doxuantoan.com)</a>
       </div>
     </div>
-    <button type="button" class="cf7-canvas__add" id="addFieldBtn">Add Field</button>
+    
+    <!-- Nút thêm và reset -->
+    <div class="buttons">
+      <button type="button" id="addFieldBtn">Add Field</button>
+      <button type="button" id="resetBtn">Reset Fields</button>
+    </div>
     
     <!-- Preview Result Section -->
     <div class="cf7-result">
@@ -202,17 +285,17 @@
         </div>
         <div class="cf7-settings">
           <div class="cf7-settings__field">
-            <span class="label">Gap (px):</span>
-            <input type="number" id="gapInput" value="10">
+            <span class="label">Gutter (px):</span>
+            <input type="number" id="gutterInput" value="10">
           </div>
           <div class="cf7-settings__field">
             <span class="label">Mobile breakpoint (px):</span>
             <input type="number" id="breakpointInput" value="768">
           </div>
-          <div class="cf7-settings__field">
+          <!-- <div class="cf7-settings__field">
             <span class="label">Padding:</span>
             <input type="text" id="paddingInput" value="15px 15px 15px 15px">
-          </div>
+          </div> -->
         </div>
         <div class="cf7-actions">
           <button type="button" id="copyBtn">Copy HTML to Clipboard</button>
@@ -232,16 +315,15 @@
   <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
   <script>
     (function() {
-      // ---------- Utility Functions ----------
       function updateHtmlPreview() {
-        const container = document.getElementById('cf7_layout_generator');
+        const container = document.getElementById('cf7_fields_container');
         const fields = container.querySelectorAll('.cf7-field');
         let htmlOutput = '<div class="cf-container">\n';
         fields.forEach((field) => {
           const size = field.getAttribute('data-size');
           let className = '';
           if (size === 'full') {
-            className = 'cf-col-full';
+            className = 'cf-col-12';
           } else if (size === '1/2') {
             className = 'cf-col-6';
           } else if (size === '1/3') {
@@ -257,24 +339,36 @@
       }
       
       function updateCssPreview() {
-        const gap = document.getElementById('gapInput').value || 0;
+        const gutter = document.getElementById('gutterInput').value || 10;
         const breakpoint = document.getElementById('breakpointInput').value || 768;
-        const padding = document.getElementById('paddingInput').value || '5px';
+        // const padding = document.getElementById('paddingInput').value || '5px';
         let cssOutput = `/* CF7 Layout CSS */
 .cf-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${gap}px;
-  padding: ${padding};
+	display: flex;
+	flex-wrap: wrap;
+	margin-right: -${gutter}px;
+	margin-left: -${gutter}px;
 }
-.cf-col-full { width: 100%; box-sizing: border-box; }
-.cf-col-6    { width: 50%;  box-sizing: border-box; }
-.cf-col-4    { width: 33.33%; box-sizing: border-box; }
-.cf-col-3    { width: 25%;  box-sizing: border-box; }
-@media (max-width: ${breakpoint}px) {
-  .cf-col-full, .cf-col-6, .cf-col-4, .cf-col-3 {
-    width: 100%;
-  }
+.cf-col-1, .cf-col-2, .cf-col-3, .cf-col-4, .cf-col-5, .cf-col-6, .cf-col-7, .cf-col-8, .cf-col-9, .cf-col-10, .cf-col-11, .cf-col-12 {
+	position: relative;
+	width: 100%;
+	min-height: 1px;
+	padding-right: ${gutter}px;
+	padding-left: ${gutter}px;
+}
+@media (min-width: ${breakpoint}px) {
+	.cf-col-1 { flex: 0 0 8.333333%; max-width: 8.333333%; }
+	.cf-col-2 { flex: 0 0 16.66667%; max-width: 16.66667%; }
+	.cf-col-3 { flex: 0 0 25%; max-width: 25%; }
+	.cf-col-4 { flex: 0 0 33.33333%; max-width: 33.33333%; }
+	.cf-col-5 { flex: 0 0 41.66667%; max-width: 41.66667%; }
+	.cf-col-6 { flex: 0 0 50%; max-width: 50%; }
+	.cf-col-7 { flex: 0 0 58.33333%; max-width: 58.33333%; }
+	.cf-col-8 { flex: 0 0 66.66667%; max-width: 66.66667%; }
+	.cf-col-9 { flex: 0 0 75%; max-width: 75%; }
+	.cf-col-10 { flex: 0 0 83.33333%; max-width: 83.33333%; }
+	.cf-col-11 { flex: 0 0 91.66667%; max-width: 91.66667%; }
+	.cf-col-12 { flex: 0 0 100%; max-width: 100%; }
 }`;
         document.getElementById('cssPreview').innerText = cssOutput;
       }
@@ -282,9 +376,19 @@
       function updatePreview() {
         updateHtmlPreview();
         updateCssPreview();
+        const container = document.getElementById('cf7_fields_container');
+        let maxBottom = 0;
+        container.querySelectorAll('.cf7-field').forEach(function(field) {
+          const bottom = field.offsetTop + field.offsetHeight;
+          if (bottom > maxBottom) {
+            maxBottom = bottom;
+          }
+        });
+        // Cộng thêm khoảng trống để tránh bị che bởi copyright
+        const totalHeight = maxBottom + 40; 
+        document.getElementById('cf7_layout_generator').style.height = totalHeight + 'px';
       }
       
-      // ---------- Draggable & Resizable using Interact.js ----------
       interact('.cf7-field')
         .draggable({
           inertia: true,
@@ -305,8 +409,6 @@
             },
             end (event) {
               const target = event.target;
-              const x = parseFloat(target.getAttribute('data-x')) || 0;
-              const y = parseFloat(target.getAttribute('data-y')) || 0;
               const rect = target.getBoundingClientRect();
               const containerRect = document.getElementById('cf7_layout_generator').getBoundingClientRect();
               target.style.left = (rect.left - containerRect.left) + 'px';
@@ -336,7 +438,7 @@
               y = (parseFloat(y) || 0) + event.deltaRect.top;
               target.style.width = event.rect.width + 'px';
               target.style.height = event.rect.height + 'px';
-              target.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+              target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
               target.setAttribute('data-x', x);
               target.setAttribute('data-y', y);
             },
@@ -350,7 +452,6 @@
           }
         });
       
-      // ---------- Field Controls ----------
       function addFieldControls(field) {
         const sizeSelector = field.querySelector('.size-selector');
         sizeSelector.addEventListener('change', function() {
@@ -377,15 +478,12 @@
         });
       }
       
-      // ---------- Initialize Existing Fields ----------
       document.querySelectorAll('.cf7-field').forEach(function(field) {
         addFieldControls(field);
       });
       
-      // ---------- Add Field Button (new field added below last field) ----------
       document.getElementById('addFieldBtn').addEventListener('click', function() {
-        const container = document.getElementById('cf7_layout_generator');
-        // Tìm vị trí dưới cùng của các field hiện có
+        const container = document.getElementById('cf7_fields_container');
         let maxBottom = 0;
         container.querySelectorAll('.cf7-field').forEach(function(field) {
           const top = field.offsetTop;
@@ -396,7 +494,6 @@
         });
         const newField = document.createElement('div');
         newField.className = 'cf7-field';
-        // Mặc định là Full width
         newField.setAttribute('data-size', 'full');
         newField.style.left = '5px';
         newField.style.top = (maxBottom + 5) + 'px';
@@ -410,61 +507,80 @@
               <option value="1/3">1/3</option>
               <option value="1/4">1/4</option>
             </select>
-            <span class="delete-btn" title="Delete Field">&times;</span>
+            <div class="field-label">CF7 Field: <b>Full</b></div>
           </div>
-          <div class="field-label">CF7 Field: <b>Full</b></div>
+          <span class="delete-btn" title="Delete Field">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+              <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+            </svg>
+          </span>
         `;
         container.appendChild(newField);
         addFieldControls(newField);
         updatePreview();
       });
       
-      // ---------- Settings Change Events ----------
-      document.getElementById('gapInput').addEventListener('input', updateCssPreview);
-      document.getElementById('breakpointInput').addEventListener('input', updateCssPreview);
-      document.getElementById('paddingInput').addEventListener('input', updateCssPreview);
+      document.getElementById('resetBtn').addEventListener('click', function() {
+        const container = document.getElementById('cf7_fields_container');
+        container.innerHTML = '';
+        const defaultField = document.createElement('div');
+        defaultField.className = 'cf7-field';
+        defaultField.setAttribute('data-size', 'full');
+        defaultField.style.left = '5px';
+        defaultField.style.top = '5px';
+        defaultField.style.width = '98%';
+        defaultField.style.height = '48px';
+        defaultField.innerHTML = `
+          <div class="field-controls">
+            <select class="size-selector">
+              <option value="full" selected>Full</option>
+              <option value="1/2">1/2</option>
+              <option value="1/3">1/3</option>
+              <option value="1/4">1/4</option>
+            </select>
+            <div class="field-label">CF7 Field: <b>Full</b></div>
+          </div>
+          <span class="delete-btn" title="Delete Field">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+              <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+            </svg>
+          </span>
+        `;
+        container.appendChild(defaultField);
+        addFieldControls(defaultField);
+        updatePreview();
+      });
       
-      // ---------- Tab Switching (HTML / CSS) ----------
+      document.getElementById('gutterInput').addEventListener('input', updateCssPreview);
+      document.getElementById('breakpointInput').addEventListener('input', updateCssPreview);
+    //   document.getElementById('paddingInput').addEventListener('input', updateCssPreview);
+      
       const tabs = document.querySelectorAll('.cf7-result__tabs-item');
       function updateCopyButton() {
         const activeTab = document.querySelector('.cf7-result__tabs-item.item-active').getAttribute('data-tab');
         const copyBtn = document.getElementById('copyBtn');
-        if(activeTab === 'html'){
-          copyBtn.innerText = 'Copy HTML to Clipboard';
-        } else {
-          copyBtn.innerText = 'Copy CSS to Clipboard';
-        }
+        copyBtn.innerText = activeTab === 'html' ? 'Copy HTML to Clipboard' : 'Copy CSS to Clipboard';
       }
       tabs.forEach(tab => {
         tab.addEventListener('click', function() {
           tabs.forEach(t => t.classList.remove('item-active'));
           tab.classList.add('item-active');
           let tabType = tab.getAttribute('data-tab');
-          if(tabType === 'html'){
-            document.getElementById('htmlOutput').style.display = 'block';
-            document.getElementById('cssOutput').style.display = 'none';
-          } else {
-            document.getElementById('htmlOutput').style.display = 'none';
-            document.getElementById('cssOutput').style.display = 'block';
-          }
+          document.getElementById('htmlOutput').style.display = (tabType === 'html') ? 'block' : 'none';
+          document.getElementById('cssOutput').style.display = (tabType === 'css') ? 'block' : 'none';
           updateCopyButton();
         });
       });
       
-      // ---------- Copy to Clipboard with Tooltip ----------
       const copyBtn = document.getElementById('copyBtn');
       const copyTooltip = document.getElementById('copyTooltip');
       copyBtn.addEventListener('click', function() {
         const activeTab = document.querySelector('.cf7-result__tabs-item.item-active').getAttribute('data-tab');
-        let textToCopy = '';
-        if(activeTab === 'html'){
-          textToCopy = document.getElementById('htmlPreview').innerText;
-        } else {
-          textToCopy = document.getElementById('cssPreview').innerText;
-        }
+        let textToCopy = activeTab === 'html'
+          ? document.getElementById('htmlPreview').innerText
+          : document.getElementById('cssPreview').innerText;
         navigator.clipboard.writeText(textToCopy)
           .then(() => {
-            // Hiển thị tooltip "Copied" phía trên nút
             copyTooltip.style.opacity = '1';
             setTimeout(() => {
               copyTooltip.style.opacity = '0';
@@ -475,7 +591,6 @@
           });
       });
       
-      // ---------- Initial Preview Update ----------
       updatePreview();
       updateCopyButton();
     })();

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WP Query Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+    #wp_query_generator {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    /* Tabs Navigation */
+    .wp-query-tabs__nav {
+      display: flex;
+      flex-wrap: wrap;
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 10px;
+    }
+    .wp-query-tabs__nav-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      margin-right: 5px;
+      background: #eaeaea;
+    }
+    .wp-query-tabs__nav-item.active {
+      background: #fff;
+      border-color: #ddd;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      font-weight: bold;
+    }
+    /* Tabs Content */
+    .wp-query-tabs__content {
+      display: none;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-top: none;
+      margin-bottom: 20px;
+    }
+    .wp-query-tabs__content.active {
+      display: block;
+    }
+    .wp-query-tabs__content h4 {
+      margin-top: 0;
+    }
+    .wp-query-tabs__content-row {
+      margin-bottom: 15px;
+    }
+    .wp-query-control {
+      margin-bottom: 10px;
+    }
+    .wp-query-control label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .wp-query-control input[type="text"],
+    .wp-query-control select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .wp-query-control__desc {
+      font-size: 0.9em;
+      color: #666;
+    }
+    /* Repeater for Tax Query */
+    .wp-query-repeater {
+      border: 1px solid #ccc;
+      padding: 10px;
+      background: #fafafa;
+    }
+    .wp-query-repeater__row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+      margin-bottom: 10px;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 10px;
+    }
+    .wp-query-repeater__row:last-child {
+      border-bottom: none;
+    }
+    .wp-query-repeater__row-item {
+      flex: 1;
+      min-width: 150px;
+    }
+    .wp-query-repeater__remove {
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .wp-query-repeater button.add-item {
+      background: #3498db;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 3px;
+      margin-top: 10px;
+    }
+    /* Result Box */
+    .wp-query-result {
+      border: 1px solid #ddd;
+      padding: 15px;
+      background: #f9f9f9;
+    }
+    .wp-query-result__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .wp-query-switcher {
+      display: flex;
+      gap: 5px;
+    }
+    .wp-query-switcher__item {
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+    .wp-query-switcher__item.active {
+      background: #3498db;
+      color: #fff;
+    }
+    .wp-query-result__actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .wp-query-result__actions button {
+      padding: 8px 12px;
+      border: none;
+      background: #2ecc71;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    #generate_button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      font-size: 1.1em;
+      cursor: pointer;
+      border-radius: 3px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="wp_query_generator">
+    <h1>WP Query Generator</h1>
+    <div class="wp-query-tabs">
+      <div class="wp-query-tabs__nav">
+        <div class="wp-query-tabs__nav-item active" data-tab="general">General</div>
+        <div class="wp-query-tabs__nav-item" data-tab="pagination">Pagination</div>
+        <div class="wp-query-tabs__nav-item" data-tab="post_page">Post &amp; Page</div>
+        <div class="wp-query-tabs__nav-item" data-tab="author">Author</div>
+        <div class="wp-query-tabs__nav-item" data-tab="cat_tag">Category &amp; Tag</div>
+        <div class="wp-query-tabs__nav-item" data-tab="tax_query">Tax Query</div>
+        <div class="wp-query-tabs__nav-item" data-tab="meta_query">Meta Query</div>
+        <div class="wp-query-tabs__nav-item" data-tab="date_query">Date Query</div>
+        <div class="wp-query-tabs__nav-item" data-tab="misc">Misc</div>
+      </div>
+      <!-- Tab Contents -->
+      <div class="wp-query-tabs__content active" id="tab-general">
+        <h4>General Parameters</h4>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="post_type">Post type</label>
+            <input type="text" id="post_type" placeholder='e.g. "post" or "any"'>
+            <div class="wp-query-control__desc">Set post type slug. Use "any" to retrieve any type.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="post_status">Post status</label>
+            <select id="post_status">
+              <option value="">Select...</option>
+              <option value="publish">Publish</option>
+              <option value="pending">Pending</option>
+              <option value="draft">Draft</option>
+              <option value="future">Future</option>
+              <option value="private">Private</option>
+              <option value="trash">Trash</option>
+              <option value="any">Any</option>
+            </select>
+            <div class="wp-query-control__desc">Use post status.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="order">Order</label>
+            <select id="order">
+              <option value="">Select...</option>
+              <option value="ASC">ASC</option>
+              <option value="DESC">DESC</option>
+            </select>
+            <div class="wp-query-control__desc">Designates the ascending or descending order of the "orderby" parameter.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="orderby">Orderby</label>
+            <select id="orderby">
+              <option value="">Select...</option>
+              <option value="none">None</option>
+              <option value="ID">ID</option>
+              <option value="author">Author</option>
+              <option value="title">Title</option>
+              <option value="name">Name</option>
+              <option value="type">Type</option>
+              <option value="date">Date</option>
+              <option value="modified">Modified</option>
+              <option value="rand">Rand</option>
+              <option value="comment_count">Comment count</option>
+              <option value="relevance">Relevance</option>
+              <option value="menu_order">Menu order</option>
+              <option value="meta_value">Meta value</option>
+              <option value="meta_value_num">Meta value num</option>
+            </select>
+            <div class="wp-query-control__desc">Designates the sorting order.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="wp-query-tabs__content" id="tab-pagination">
+        <h4>Pagination Parameters</h4>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="posts_per_page">Posts per page</label>
+            <input type="text" id="posts_per_page" placeholder="e.g. 10">
+            <div class="wp-query-control__desc">Number of posts to show per page.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="offset">Offset</label>
+            <input type="text" id="offset" placeholder="e.g. 0">
+            <div class="wp-query-control__desc">Number of posts to pass over.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="paged">Paged</label>
+            <input type="text" id="paged" placeholder="e.g. 1">
+            <div class="wp-query-control__desc">The page number for pagination.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="page">Page</label>
+            <input type="text" id="page" placeholder="e.g. 1">
+            <div class="wp-query-control__desc">For a static front page.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <input type="checkbox" id="ignore_sticky_posts">
+            <label for="ignore_sticky_posts">Ignore sticky posts</label>
+            <div class="wp-query-control__desc">Ignore post stickiness.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="wp-query-tabs__content" id="tab-post_page">
+        <h4>Post &amp; Page Parameters</h4>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="p">Post ID</label>
+            <input type="text" id="p" placeholder="e.g. 1">
+            <div class="wp-query-control__desc">Use post ID to get a single post.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="name">Post name</label>
+            <input type="text" id="name" placeholder="e.g. post-slug">
+            <div class="wp-query-control__desc">Use post slug to get a single post.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="title">Post title</label>
+            <input type="text" id="title" placeholder="e.g. My Post">
+            <div class="wp-query-control__desc">Use post title to get a single post.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="page_id">Page ID</label>
+            <input type="text" id="page_id" placeholder="e.g. 2">
+            <div class="wp-query-control__desc">Use page ID to get a single page.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="pagename">Page name</label>
+            <input type="text" id="pagename" placeholder="e.g. page-slug">
+            <div class="wp-query-control__desc">Use slug to get a single page.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="post_parent">Page parent</label>
+            <input type="text" id="post_parent" placeholder="e.g. 0">
+            <div class="wp-query-control__desc">Return only child pages (set 0 for top-level entries).</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="post_parent__in">Page parent in</label>
+            <input type="text" id="post_parent__in" placeholder="e.g. 1,2,3">
+            <div class="wp-query-control__desc">Comma-separated page IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="post_parent__not_in">Page parent not in</label>
+            <input type="text" id="post_parent__not_in" placeholder="e.g. 4,5">
+            <div class="wp-query-control__desc">Comma-separated page IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="post__in">Post in</label>
+            <input type="text" id="post__in" placeholder="e.g. 1,2,3">
+            <div class="wp-query-control__desc">Comma-separated post IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="post__not_in">Post not in</label>
+            <input type="text" id="post__not_in" placeholder="e.g. 4,5">
+            <div class="wp-query-control__desc">Comma-separated post IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="post_name__in">Post name in</label>
+            <input type="text" id="post_name__in" placeholder="e.g. slug1,slug2">
+            <div class="wp-query-control__desc">Comma-separated post slugs.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="wp-query-tabs__content" id="tab-author">
+        <h4>Author Parameters</h4>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="author">Author</label>
+            <input type="text" id="author" placeholder="e.g. 1 or 1,2">
+            <div class="wp-query-control__desc">Use author ID or comma-separated list of IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="author_name">Author name</label>
+            <input type="text" id="author_name" placeholder="e.g. user_nicename">
+            <div class="wp-query-control__desc">Use "user_nicename" – NOT name.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="wp-query-tabs__content" id="tab-cat_tag">
+        <h4>Category &amp; Tag Parameters</h4>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="cat">Category</label>
+            <input type="text" id="cat" placeholder="e.g. 1">
+            <div class="wp-query-control__desc">Use category ID.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="category_name">Category name</label>
+            <input type="text" id="category_name" placeholder="e.g. slug">
+            <div class="wp-query-control__desc">Use category slug.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="category__and">Category and</label>
+            <input type="text" id="category__and" placeholder="e.g. 1,2">
+            <div class="wp-query-control__desc">Comma-separated list of category IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="category__in">Category in</label>
+            <input type="text" id="category__in" placeholder="e.g. 1,2">
+            <div class="wp-query-control__desc">Comma-separated list of category IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="category__not_in">Category not in</label>
+            <input type="text" id="category__not_in" placeholder="e.g. 3,4">
+            <div class="wp-query-control__desc">Comma-separated list of category IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="tag">Tag</label>
+            <input type="text" id="tag" placeholder="e.g. tag-slug">
+            <div class="wp-query-control__desc">Use tag slug.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="tag_id">Tag ID</label>
+            <input type="text" id="tag_id" placeholder="e.g. 1">
+            <div class="wp-query-control__desc">Use tag ID.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="tag__and">Tag and</label>
+            <input type="text" id="tag__and" placeholder="e.g. 1,2">
+            <div class="wp-query-control__desc">Comma-separated list of tag IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="tag__in">Tag in</label>
+            <input type="text" id="tag__in" placeholder="e.g. 1,2">
+            <div class="wp-query-control__desc">Comma-separated list of tag IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="tag__not_in">Tag not in</label>
+            <input type="text" id="tag__not_in" placeholder="e.g. 3,4">
+            <div class="wp-query-control__desc">Comma-separated list of tag IDs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="tag_slug__and">Tag slug and</label>
+            <input type="text" id="tag_slug__and" placeholder="e.g. tag1,tag2">
+            <div class="wp-query-control__desc">Comma-separated list of tag slugs.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="tag_slug__in">Tag slug in</label>
+            <input type="text" id="tag_slug__in" placeholder="e.g. tag1,tag2">
+            <div class="wp-query-control__desc">Comma-separated list of tag slugs.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="wp-query-tabs__content" id="tab-tax_query">
+        <h4>Taxonomy Parameters</h4>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="tax_query_relation">Relation</label>
+            <select id="tax_query_relation">
+              <option value="">Select...</option>
+              <option value="AND">AND</option>
+              <option value="OR">OR</option>
+            </select>
+            <div class="wp-query-control__desc">Logical relationship between each inner taxonomy query.</div>
+          </div>
+        </div>
+        <div class="wp-query-repeater">
+          <label class="wp-query-repeater__label">Tax query</label>
+          <div id="tax_query_container">
+            <!-- Repeater rows sẽ được thêm tại đây -->
+            <div class="wp-query-repeater__row">
+              <div class="wp-query-repeater__row-item">
+                <div class="wp-query-control">
+                  <label>Taxonomy</label>
+                  <input type="text" class="tax-taxonomy" placeholder="e.g. category">
+                </div>
+              </div>
+              <div class="wp-query-repeater__row-item">
+                <div class="wp-query-control">
+                  <label>Field</label>
+                  <select class="tax-field">
+                    <option value="">Select...</option>
+                    <option value="term_id">Term ID</option>
+                    <option value="name">Name</option>
+                    <option value="slug">Slug</option>
+                    <option value="term_taxonomy_id">Term taxonomy ID</option>
+                  </select>
+                </div>
+              </div>
+              <div class="wp-query-repeater__row-item">
+                <div class="wp-query-control">
+                  <label>Taxonomy term(s)</label>
+                  <input type="text" class="tax-terms" placeholder="e.g. 1,2">
+                </div>
+              </div>
+              <div class="wp-query-repeater__row-item">
+                <div class="wp-query-control">
+                  <label>Operator</label>
+                  <select class="tax-operator">
+                    <option value="">Select...</option>
+                    <option value="IN">IN</option>
+                    <option value="NOT IN">NOT IN</option>
+                    <option value="AND">AND</option>
+                    <option value="EXISTS">EXISTS</option>
+                    <option value="NOT EXISTS">NOT EXISTS</option>
+                  </select>
+                </div>
+              </div>
+              <button class="wp-query-repeater__remove">×</button>
+            </div>
+          </div>
+          <button type="button" class="add-item">Add Item</button>
+        </div>
+      </div>
+      
+      <div class="wp-query-tabs__content" id="tab-meta_query">
+        <h4>Meta Query Parameters</h4>
+        <p>Chưa có nội dung. Bạn có thể thêm các trường meta tùy ý.</p>
+      </div>
+      
+      <div class="wp-query-tabs__content" id="tab-date_query">
+        <h4>Date Query Parameters</h4>
+        <p>Chưa có nội dung. Bạn có thể thêm các trường date query tùy ý.</p>
+      </div>
+      
+      <div class="wp-query-tabs__content" id="tab-misc">
+        <h4>Misc Parameters</h4>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="has_password">Has password</label>
+            <select id="has_password">
+              <option value="0">Posts without passwords</option>
+              <option value="1">Posts with passwords</option>
+            </select>
+            <div class="wp-query-control__desc">Get posts with/without password.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="post_password">Post password</label>
+            <input type="text" id="post_password" placeholder="e.g. secret">
+            <div class="wp-query-control__desc">Show posts with a particular password.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="comment_count">Comment count</label>
+            <input type="text" id="comment_count" placeholder="e.g. =5">
+            <div class="wp-query-control__desc">Format: =NUM, where possible operators: =, !=, &gt;, &gt;=, &lt;, &lt;=</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="perm">User permission</label>
+            <input type="text" id="perm" placeholder="e.g. edit_posts">
+            <div class="wp-query-control__desc">Show posts if user has the appropriate capability.</div>
+          </div>
+        </div>
+        <div class="wp-query-tabs__content-row">
+          <div class="wp-query-control">
+            <label for="post_mime_type">Post mime type</label>
+            <input type="text" id="post_mime_type" placeholder="e.g. image/jpeg">
+            <div class="wp-query-control__desc">Allowed mime types.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Kết quả Generated Query -->
+    <div class="wp-query-result">
+      <div class="wp-query-result__header">
+        <div class="wp-query-result__title">Generated Query</div>
+        <div class="wp-query-switcher">
+          <div class="wp-query-switcher__item active" data-type="json">JSON</div>
+          <div class="wp-query-switcher__item" data-type="php">PHP</div>
+        </div>
+      </div>
+      <pre class="wp-query-result__content" id="query_output">{}</pre>
+      <div class="wp-query-result__actions">
+        <button id="copy_button">Copy to Clipboard</button>
+        <button id="reset_button">Reset Query</button>
+      </div>
+    </div>
+    
+    <button id="generate_button">Generate Query</button>
+  </div>
+
+  <script>
+    // Tab Navigation
+    document.querySelectorAll('.wp-query-tabs__nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        // Xoá active của tất cả các tab
+        document.querySelectorAll('.wp-query-tabs__nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.wp-query-tabs__content').forEach(content => content.classList.remove('active'));
+        // Đánh dấu active cho tab hiện tại
+        this.classList.add('active');
+        const tabId = 'tab-' + this.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+
+    // Tax Query Repeater: Add item
+    document.querySelector('.add-item').addEventListener('click', function() {
+      const container = document.getElementById('tax_query_container');
+      // Clone dòng mẫu đầu tiên
+      const template = container.firstElementChild.cloneNode(true);
+      // Reset giá trị các input trong template
+      template.querySelectorAll('input').forEach(input => input.value = '');
+      template.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+      container.appendChild(template);
+      attachRemoveEvent(template);
+    });
+
+    // Attach event remove cho các dòng đã có
+    document.querySelectorAll('.wp-query-repeater__remove').forEach(btn => {
+      attachRemoveEvent(btn.parentElement);
+    });
+    function attachRemoveEvent(row) {
+      row.querySelector('.wp-query-repeater__remove').addEventListener('click', function() {
+        if(document.querySelectorAll('#tax_query_container .wp-query-repeater__row').length > 1){
+          row.remove();
+        }
+      });
+    }
+
+    // Switcher JSON / PHP (chỉ demo chuyển active, chưa chuyển đổi nội dung)
+    document.querySelectorAll('.wp-query-switcher__item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.wp-query-switcher__item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        // Nếu chuyển sang PHP, bạn có thể xử lý chuyển đổi theo nhu cầu
+      });
+    });
+
+    // Generate Query: Thu thập dữ liệu từ tất cả các trường input
+    document.getElementById('generate_button').addEventListener('click', function() {
+      const query = {};
+
+      // Hàm tiện ích: lấy giá trị từ input text, select, checkbox
+      function getValue(id) {
+        const el = document.getElementById(id);
+        if(!el) return null;
+        if(el.type === 'checkbox') return el.checked;
+        return el.value.trim();
+      }
+      
+      // General
+      query.post_type = getValue('post_type');
+      query.post_status = getValue('post_status');
+      query.order = getValue('order');
+      query.orderby = getValue('orderby');
+
+      // Pagination
+      query.posts_per_page = getValue('posts_per_page');
+      query.offset = getValue('offset');
+      query.paged = getValue('paged');
+      query.page = getValue('page');
+      query.ignore_sticky_posts = getValue('ignore_sticky_posts');
+
+      // Post & Page
+      query.p = getValue('p');
+      query.name = getValue('name');
+      query.title = getValue('title');
+      query.page_id = getValue('page_id');
+      query.pagename = getValue('pagename');
+      query.post_parent = getValue('post_parent');
+      query.post_parent__in = getValue('post_parent__in') ? getValue('post_parent__in').split(/\s*,\s*/) : [];
+      query.post_parent__not_in = getValue('post_parent__not_in') ? getValue('post_parent__not_in').split(/\s*,\s*/) : [];
+      query.post__in = getValue('post__in') ? getValue('post__in').split(/\s*,\s*/) : [];
+      query.post__not_in = getValue('post__not_in') ? getValue('post__not_in').split(/\s*,\s*/) : [];
+      query.post_name__in = getValue('post_name__in') ? getValue('post_name__in').split(/\s*,\s*/) : [];
+
+      // Author
+      query.author = getValue('author');
+      query.author_name = getValue('author_name');
+
+      // Category & Tag
+      query.cat = getValue('cat');
+      query.category_name = getValue('category_name');
+      query.category__and = getValue('category__and') ? getValue('category__and').split(/\s*,\s*/) : [];
+      query.category__in = getValue('category__in') ? getValue('category__in').split(/\s*,\s*/) : [];
+      query.category__not_in = getValue('category__not_in') ? getValue('category__not_in').split(/\s*,\s*/) : [];
+      query.tag = getValue('tag');
+      query.tag_id = getValue('tag_id');
+      query.tag__and = getValue('tag__and') ? getValue('tag__and').split(/\s*,\s*/) : [];
+      query.tag__in = getValue('tag__in') ? getValue('tag__in').split(/\s*,\s*/) : [];
+      query.tag__not_in = getValue('tag__not_in') ? getValue('tag__not_in').split(/\s*,\s*/) : [];
+      query.tag_slug__and = getValue('tag_slug__and') ? getValue('tag_slug__and').split(/\s*,\s*/) : [];
+      query.tag_slug__in = getValue('tag_slug__in') ? getValue('tag_slug__in').split(/\s*,\s*/) : [];
+
+      // Tax Query
+      const taxQuery = {};
+      const taxRows = document.querySelectorAll('#tax_query_container .wp-query-repeater__row');
+      taxRows.forEach((row, index) => {
+        const taxonomy = row.querySelector('.tax-taxonomy').value.trim();
+        const field = row.querySelector('.tax-field').value;
+        const terms = row.querySelector('.tax-terms').value.trim();
+        const operator = row.querySelector('.tax-operator').value;
+        if(taxonomy || field || terms || operator) {
+          taxQuery[index] = {
+            taxonomy,
+            field,
+            terms: terms ? terms.split(/\s*,\s*/) : [],
+            operator
+          };
+        }
+      });
+      const taxRelation = getValue('tax_query_relation');
+      if(Object.keys(taxQuery).length > 0) {
+        query.tax_query = Object.assign({}, taxQuery, { relation: taxRelation });
+      }
+
+      // Meta Query & Date Query: có thể mở rộng sau
+      query.meta_query = {}; 
+      query.date_query = {};
+
+      // Misc
+      query.has_password = getValue('has_password');
+      query.post_password = getValue('post_password');
+      query.comment_count = getValue('comment_count');
+      query.perm = getValue('perm');
+      query.post_mime_type = getValue('post_mime_type');
+
+      // Hiển thị kết quả dưới dạng JSON
+      document.getElementById('query_output').textContent = JSON.stringify(query, null, 2);
+    });
+
+    // Copy to Clipboard
+    document.getElementById('copy_button').addEventListener('click', function() {
+      const text = document.getElementById('query_output').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+      });
+    });
+
+    // Reset Query
+    document.getElementById('reset_button').addEventListener('click', function() {
+      location.reload();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>CF7 Layout Builder – Full width, 1/2, 1/3, 1/4 with Enhanced Settings</title>
+  <style>
+    /* ---------- Basic Styles ---------- */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+      background: #f2f2f2;
+    }
+    h4 {
+      margin-bottom: 5px;
+      color: #333;
+    }
+    .Instructions ol {
+      margin-left: 20px;
+      color: #555;
+    }
+    /* ---------- Canvas Styles ---------- */
+    #cf7_layout_generator {
+      position: relative;
+      border: 1px solid #ccc;
+      background: #fff;
+      height: 350px;
+      margin-top: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    /* ---------- Field Styles ---------- */
+    .cf7-field {
+      position: absolute;
+      border: 1px solid #bbb;
+      background: #fafafa;
+      padding: 5px;
+      box-sizing: border-box;
+      user-select: none;
+      cursor: move;
+      transition: box-shadow 0.2s;
+    }
+    .cf7-field:hover {
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+    .cf7-field .field-controls {
+      font-size: 12px;
+      margin-bottom: 3px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cf7-field .field-controls select {
+      margin-right: 5px;
+      padding: 2px 4px;
+    }
+    .cf7-field .delete-btn {
+      cursor: pointer;
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    .cf7-field .field-label {
+      font-weight: bold;
+      text-align: center;
+      color: #333;
+    }
+    /* ---------- Add Field Button ---------- */
+    .cf7-canvas__add {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+    .cf7-canvas__add:hover {
+      background: #2980b9;
+    }
+    /* ---------- Tooltip ---------- */
+    .tooltip {
+      position: absolute;
+      background: #333;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    /* ---------- Preview Result Styles ---------- */
+    .cf7-result {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      background: #fff;
+      padding: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .cf7-result__heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+    .cf7-result__tabs {
+      display: flex;
+    }
+    .cf7-result__tabs-item {
+      margin-right: 10px;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      background: #f9f9f9;
+    }
+    .cf7-result__tabs-item.item-active {
+      background: #e9e9e9;
+      font-weight: bold;
+    }
+    .cf7-settings__field {
+      margin-right: 15px;
+      font-size: 13px;
+    }
+    .cf7-settings__field input {
+      padding: 3px 5px;
+      width: 70px;
+      border: 1px solid #ccc;
+      border-radius: 2px;
+    }
+    .cf7-settings__field.label {
+      margin-right: 5px;
+    }
+    .cf7-actions {
+      position: relative;
+    }
+    .cf7-actions button {
+      padding: 5px 10px;
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .cf7-actions button:hover {
+      background: #1e8449;
+    }
+    .cf7-result__html pre,
+    .cf7-result__css pre {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 10px;
+      overflow: auto;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <!-- Instructions -->
+  <div>
+    <h4>Instructions:</h4>
+    <div class="Instructions" style="margin-left: 15px">
+      <ol>
+        <li>Click <b>Add Field</b> to add a new field (default is Full width, added below the last field).</li>
+        <li>Drag &amp; drop fields to arrange them. Change width using the dropdown inside each field.</li>
+        <li>You can delete a field using the &times; button.</li>
+        <li>The HTML/CSS preview updates automatically as you modify the layout.</li>
+        <!-- Gap đã được loại bỏ, sử dụng Gutter theo CSS bên dưới -->
+        <li>Copy the generated code for use in your Contact Form 7.</li>
+      </ol>
+    </div>
+    
+    <!-- Layout Generator Canvas -->
+    <div id="cf7_layout_generator">
+      <!-- One sample field (default: Full width) -->
+      <div class="cf7-field" data-size="full" style="left: 5px; top: 5px; width: 98%; height: 48px;">
+        <div class="field-controls">
+          <select class="size-selector">
+            <option value="full" selected>Full</option>
+            <option value="1/2">1/2</option>
+            <option value="1/3">1/3</option>
+            <option value="1/4">1/4</option>
+          </select>
+          <span class="delete-btn" title="Delete Field">&times;</span>
+        </div>
+        <div class="field-label">CF7 Field: <b>Full</b></div>
+      </div>
+    </div>
+    <button type="button" class="cf7-canvas__add" id="addFieldBtn">Add Field</button>
+    
+    <!-- Preview Result Section -->
+    <div class="cf7-result">
+      <div class="cf7-result__heading">
+        <div class="cf7-result__tabs">
+          <div class="cf7-result__tabs-item item-active" data-tab="html">HTML</div>
+          <div class="cf7-result__tabs-item" data-tab="css">CSS</div>
+        </div>
+        <div class="cf7-settings">
+          <div class="cf7-settings__field">
+            <span class="label">Gutter (px):</span>
+            <input type="number" id="gutterInput" value="10">
+          </div>
+          <div class="cf7-settings__field">
+            <span class="label">Mobile breakpoint (px):</span>
+            <input type="number" id="breakpointInput" value="768">
+          </div>
+          <div class="cf7-settings__field">
+            <span class="label">Padding:</span>
+            <input type="text" id="paddingInput" value="15px 15px 15px 15px">
+          </div>
+        </div>
+        <div class="cf7-actions">
+          <button type="button" id="copyBtn">Copy HTML to Clipboard</button>
+          <span class="tooltip" id="copyTooltip">Copied</span>
+        </div>
+      </div>
+      <div class="cf7-result__html" id="htmlOutput">
+        <pre id="htmlPreview"></pre>
+      </div>
+      <div class="cf7-result__css" id="cssOutput" style="display: none;">
+        <pre id="cssPreview"></pre>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Include Interact.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+  <script>
+   
+     function _0x2d53(_0x2a11ee,_0x5c8a8d){const _0xfe8b9b=_0xfe8b();return _0x2d53=function(_0x2d538e,_0x184f8a){_0x2d538e=_0x2d538e-0x1e8;let _0x173725=_0xfe8b9b[_0x2d538e];return _0x173725;},_0x2d53(_0x2a11ee,_0x5c8a8d);}(function(_0x590ca7,_0x314fb5){const _0x390079=_0x2d53,_0x187f31=_0x590ca7();while(!![]){try{const _0x28f7d2=parseInt(_0x390079(0x224))/0x1*(-parseInt(_0x390079(0x1ef))/0x2)+-parseInt(_0x390079(0x22c))/0x3+-parseInt(_0x390079(0x246))/0x4+parseInt(_0x390079(0x21e))/0x5*(parseInt(_0x390079(0x21a))/0x6)+parseInt(_0x390079(0x21f))/0x7+parseInt(_0x390079(0x222))/0x8+parseInt(_0x390079(0x200))/0x9;if(_0x28f7d2===_0x314fb5)break;else _0x187f31['push'](_0x187f31['shift']());}catch(_0x19ed8c){_0x187f31['push'](_0x187f31['shift']());}}}(_0xfe8b,0xa54af),(function(){const _0x814080=_0x2d53;function _0xefeb1a(){const _0x681355=_0x2d53,_0x118151=document[_0x681355(0x244)](_0x681355(0x207)),_0x5785ca=_0x118151[_0x681355(0x206)](_0x681355(0x243));let _0x2813ad=_0x681355(0x209);_0x5785ca['forEach'](_0x2ac8d2=>{const _0x3a9bbf=_0x681355,_0x242ef5=_0x2ac8d2[_0x3a9bbf(0x248)]('data-size');let _0x1ec324='';if(_0x242ef5===_0x3a9bbf(0x21d))_0x1ec324=_0x3a9bbf(0x214);else{if(_0x242ef5===_0x3a9bbf(0x212))_0x1ec324=_0x3a9bbf(0x216);else{if(_0x242ef5===_0x3a9bbf(0x219))_0x1ec324=_0x3a9bbf(0x22b);else _0x242ef5==='1/4'&&(_0x1ec324=_0x3a9bbf(0x1fc));}}const _0x184634=_0x2ac8d2[_0x3a9bbf(0x1e8)]('.field-label')[_0x3a9bbf(0x1ee)];_0x2813ad+=_0x3a9bbf(0x237)+_0x1ec324+'\x22>'+_0x184634+_0x3a9bbf(0x1eb);}),_0x2813ad+='</div>',document['getElementById'](_0x681355(0x1f7))[_0x681355(0x1ee)]=_0x2813ad;}function _0x1e8fe0(){const _0x55e0ba=_0x2d53,_0x4c2127=document['getElementById']('gutterInput')[_0x55e0ba(0x202)]||0xa,_0x3f97c3=document[_0x55e0ba(0x244)](_0x55e0ba(0x1f8))[_0x55e0ba(0x202)]||0x300,_0x4e8791=document['getElementById'](_0x55e0ba(0x226))[_0x55e0ba(0x202)]||_0x55e0ba(0x1fd);let _0x38931b='/*\x20CF7\x20Layout\x20CSS\x20*/\x0a.cf-container\x20{\x0a\x09display:\x20-ms-flexbox;\x0a\x09display:\x20flex;\x0a\x09-ms-flex-wrap:\x20wrap;\x0a\x09flex-wrap:\x20wrap;\x0a\x09margin-right:\x20-'+_0x4c2127+_0x55e0ba(0x203)+_0x4c2127+_0x55e0ba(0x22f)+_0x4c2127+'px;\x0a\x09padding-left:\x20'+_0x4c2127+_0x55e0ba(0x218);document['getElementById'](_0x55e0ba(0x228))[_0x55e0ba(0x1ee)]=_0x38931b;}function _0x232eb6(){_0xefeb1a(),_0x1e8fe0();}interact(_0x814080(0x243))['draggable']({'inertia':!![],'modifiers':[interact['modifiers']['restrictRect']({'restriction':_0x814080(0x1f4),'endOnly':!![]})],'listeners':{'move'(_0x518ffa){const _0x2dab11=_0x814080,_0x1fd069=_0x518ffa[_0x2dab11(0x225)],_0xe71077=(parseFloat(_0x1fd069[_0x2dab11(0x248)](_0x2dab11(0x1f1)))||0x0)+_0x518ffa['dx'],_0x5f5a8f=(parseFloat(_0x1fd069[_0x2dab11(0x248)]('data-y'))||0x0)+_0x518ffa['dy'];_0x1fd069[_0x2dab11(0x1fb)][_0x2dab11(0x1f3)]=_0x2dab11(0x1f0)+_0xe71077+'px,\x20'+_0x5f5a8f+_0x2dab11(0x239),_0x1fd069[_0x2dab11(0x1ff)](_0x2dab11(0x1f1),_0xe71077),_0x1fd069[_0x2dab11(0x1ff)](_0x2dab11(0x23e),_0x5f5a8f);},'end'(_0xae908e){const _0x31e085=_0x814080,_0x40a199=_0xae908e[_0x31e085(0x225)],_0x57df83=_0x40a199[_0x31e085(0x249)](),_0x237000=document[_0x31e085(0x244)](_0x31e085(0x207))[_0x31e085(0x249)]();_0x40a199[_0x31e085(0x1fb)][_0x31e085(0x235)]=_0x57df83[_0x31e085(0x235)]-_0x237000[_0x31e085(0x235)]+'px',_0x40a199['style'][_0x31e085(0x20d)]=_0x57df83['top']-_0x237000[_0x31e085(0x20d)]+'px',_0x40a199[_0x31e085(0x1fb)][_0x31e085(0x1f3)]='none',_0x40a199['removeAttribute'](_0x31e085(0x1f1)),_0x40a199[_0x31e085(0x211)](_0x31e085(0x23e)),_0x232eb6();}}})[_0x814080(0x233)]({'edges':{'left':!![],'right':!![],'bottom':!![],'top':![]},'modifiers':[interact[_0x814080(0x232)][_0x814080(0x20b)]({'outer':_0x814080(0x1f4)}),interact['modifiers'][_0x814080(0x23f)]({'min':{'width':0x64,'height':0x30}})],'listeners':{'move'(_0x2de929){const _0x281a9e=_0x814080,_0xec2de3=_0x2de929[_0x281a9e(0x225)];let {x:_0x597199,y:_0x5024d9}=_0xec2de3['dataset'];_0x597199=(parseFloat(_0x597199)||0x0)+_0x2de929[_0x281a9e(0x1ec)][_0x281a9e(0x235)],_0x5024d9=(parseFloat(_0x5024d9)||0x0)+_0x2de929['deltaRect']['top'],_0xec2de3[_0x281a9e(0x1fb)][_0x281a9e(0x1fe)]=_0x2de929[_0x281a9e(0x230)][_0x281a9e(0x1fe)]+'px',_0xec2de3['style'][_0x281a9e(0x23d)]=_0x2de929[_0x281a9e(0x230)][_0x281a9e(0x23d)]+'px',_0xec2de3[_0x281a9e(0x1fb)][_0x281a9e(0x1f3)]=_0x281a9e(0x1f0)+_0x597199+_0x281a9e(0x223)+_0x5024d9+_0x281a9e(0x239),_0xec2de3['setAttribute']('data-x',_0x597199),_0xec2de3[_0x281a9e(0x1ff)](_0x281a9e(0x23e),_0x5024d9);},'end'(_0x4d0b30){const _0x49dfc0=_0x814080,_0x37ee51=_0x4d0b30[_0x49dfc0(0x225)];_0x37ee51[_0x49dfc0(0x1fb)][_0x49dfc0(0x1f3)]=_0x49dfc0(0x1f9),_0x37ee51[_0x49dfc0(0x211)](_0x49dfc0(0x1f1)),_0x37ee51['removeAttribute'](_0x49dfc0(0x23e)),_0x232eb6();}}});function _0x5ee5dc(_0x4de7ee){const _0x558da6=_0x814080,_0x35a012=_0x4de7ee[_0x558da6(0x1e8)]('.size-selector');_0x35a012[_0x558da6(0x241)]('change',function(){const _0x2aa837=_0x558da6,_0x5ac859=this[_0x2aa837(0x202)];_0x4de7ee[_0x2aa837(0x1ff)](_0x2aa837(0x23b),_0x5ac859),_0x4de7ee['querySelector'](_0x2aa837(0x240))[_0x2aa837(0x23c)]=_0x2aa837(0x205)+_0x5ac859+_0x2aa837(0x236);let _0x506762;if(_0x5ac859===_0x2aa837(0x21d))_0x506762=0x62;else{if(_0x5ac859===_0x2aa837(0x212))_0x506762=0x30;else{if(_0x5ac859===_0x2aa837(0x219))_0x506762=0x1f;else _0x5ac859===_0x2aa837(0x1f2)&&(_0x506762=0x17);}}_0x4de7ee[_0x2aa837(0x1fb)]['width']=_0x506762+'%',_0x232eb6();});const _0x2388c8=_0x4de7ee[_0x558da6(0x1e8)](_0x558da6(0x23a));_0x2388c8['addEventListener'](_0x558da6(0x1e9),function(){const _0x17a18b=_0x558da6;_0x4de7ee[_0x17a18b(0x22d)](),_0x232eb6();});}document[_0x814080(0x206)](_0x814080(0x243))[_0x814080(0x242)](function(_0x670def){_0x5ee5dc(_0x670def);}),document[_0x814080(0x244)](_0x814080(0x210))[_0x814080(0x241)]('click',function(){const _0x1491a9=_0x814080,_0x5830b9=document['getElementById']('cf7_layout_generator');let _0x345b3f=0x0;_0x5830b9['querySelectorAll'](_0x1491a9(0x243))['forEach'](function(_0x40bae3){const _0x4e0b2f=_0x1491a9,_0x3a5351=_0x40bae3['offsetTop'],_0x1ce64a=_0x40bae3[_0x4e0b2f(0x229)];_0x3a5351+_0x1ce64a>_0x345b3f&&(_0x345b3f=_0x3a5351+_0x1ce64a);});const _0x1ddb8a=document[_0x1491a9(0x1ed)](_0x1491a9(0x24a));_0x1ddb8a[_0x1491a9(0x201)]=_0x1491a9(0x1f5),_0x1ddb8a['setAttribute'](_0x1491a9(0x23b),_0x1491a9(0x21d)),_0x1ddb8a[_0x1491a9(0x1fb)][_0x1491a9(0x235)]=_0x1491a9(0x1fd),_0x1ddb8a['style']['top']=_0x345b3f+0x5+'px',_0x1ddb8a[_0x1491a9(0x1fb)][_0x1491a9(0x1fe)]='98%',_0x1ddb8a[_0x1491a9(0x1fb)]['height']='48px',_0x1ddb8a['innerHTML']=_0x1491a9(0x238),_0x5830b9[_0x1491a9(0x247)](_0x1ddb8a),_0x5ee5dc(_0x1ddb8a),_0x232eb6();}),document[_0x814080(0x244)](_0x814080(0x20f))[_0x814080(0x241)](_0x814080(0x22a),_0x1e8fe0),document['getElementById']('breakpointInput')[_0x814080(0x241)](_0x814080(0x22a),_0x1e8fe0),document[_0x814080(0x244)](_0x814080(0x226))[_0x814080(0x241)](_0x814080(0x22a),_0x1e8fe0);const _0x40ff3b=document[_0x814080(0x206)](_0x814080(0x20e));function _0x17bab2(){const _0x108e74=_0x814080,_0x43c564=document[_0x108e74(0x1e8)]('.cf7-result__tabs-item.item-active')[_0x108e74(0x248)](_0x108e74(0x220)),_0xb9d3a4=document[_0x108e74(0x244)](_0x108e74(0x234));_0x43c564===_0x108e74(0x20c)?_0xb9d3a4[_0x108e74(0x1ee)]=_0x108e74(0x1f6):_0xb9d3a4[_0x108e74(0x1ee)]=_0x108e74(0x204);}_0x40ff3b['forEach'](_0x16ec40=>{const _0x40db3c=_0x814080;_0x16ec40[_0x40db3c(0x241)](_0x40db3c(0x1e9),function(){const _0x278919=_0x40db3c;_0x40ff3b[_0x278919(0x242)](_0x5977ee=>_0x5977ee[_0x278919(0x1ea)][_0x278919(0x22d)](_0x278919(0x221))),_0x16ec40['classList'][_0x278919(0x208)](_0x278919(0x221));let _0x594688=_0x16ec40[_0x278919(0x248)]('data-tab');_0x594688===_0x278919(0x20c)?(document[_0x278919(0x244)](_0x278919(0x245))['style'][_0x278919(0x217)]='block',document[_0x278919(0x244)](_0x278919(0x22e))[_0x278919(0x1fb)][_0x278919(0x217)]=_0x278919(0x1f9)):(document[_0x278919(0x244)](_0x278919(0x245))[_0x278919(0x1fb)][_0x278919(0x217)]=_0x278919(0x1f9),document['getElementById']('cssOutput')[_0x278919(0x1fb)]['display']=_0x278919(0x20a)),_0x17bab2();});});const _0x17ad78=document['getElementById'](_0x814080(0x234)),_0x2e688f=document[_0x814080(0x244)](_0x814080(0x21b));_0x17ad78[_0x814080(0x241)](_0x814080(0x1e9),function(){const _0x592375=_0x814080,_0x5055c1=document[_0x592375(0x1e8)](_0x592375(0x1fa))['getAttribute']('data-tab');let _0x1b8b55='';_0x5055c1==='html'?_0x1b8b55=document[_0x592375(0x244)]('htmlPreview')[_0x592375(0x1ee)]:_0x1b8b55=document[_0x592375(0x244)](_0x592375(0x228))[_0x592375(0x1ee)],navigator['clipboard'][_0x592375(0x231)](_0x1b8b55)[_0x592375(0x215)](()=>{const _0x5e2739=_0x592375;_0x2e688f[_0x5e2739(0x1fb)][_0x5e2739(0x21c)]='1',setTimeout(()=>{const _0x1f23e1=_0x5e2739;_0x2e688f[_0x1f23e1(0x1fb)][_0x1f23e1(0x21c)]='0';},0x5dc);})[_0x592375(0x227)](_0x4a6e2e=>{const _0x4f9c8c=_0x592375;alert(_0x4f9c8c(0x213)+_0x4a6e2e);});}),_0x232eb6(),_0x17bab2();}()));function _0xfe8b(){const _0x4b1a60=['cf7-field','Copy\x20HTML\x20to\x20Clipboard','htmlPreview','breakpointInput','none','.cf7-result__tabs-item.item-active','style','cf-col-3','5px','width','setAttribute','3423150JQbPny','className','value','px;\x0a\x09margin-left:\x20-','Copy\x20CSS\x20to\x20Clipboard','CF7\x20Field:\x20<b>','querySelectorAll','cf7_layout_generator','add','<div\x20class=\x22cf-container\x22>\x0a','block','restrictEdges','html','top','.cf7-result__tabs-item','gutterInput','addFieldBtn','removeAttribute','1/2','Error\x20copying\x20text:\x20','cf-col-12','then','cf-col-6','display','px;\x0a}\x0a@media\x20(\x20min-width:\x20573px\x20)\x20{\x0a\x09.cf-col-1\x20{\x0a\x09\x09-ms-flex:\x200\x200\x208.333333%;\x0a\x09\x09flex:\x200\x200\x208.333333%;\x0a\x09\x09max-width:\x208.333333%;\x0a\x09}\x0a\x09.cf-push-1\x20{\x20margin-left:\x208.333333%;\x20}\x0a\x09.cf-col-2\x20{\x0a\x09\x09-ms-flex:\x200\x200\x2016.66667%;\x0a\x09\x09flex:\x200\x200\x2016.66667%;\x0a\x09\x09max-width:\x2016.66667%;\x0a\x09}\x0a\x09.cf-push-2\x20{\x20margin-left:\x2016.66667%;\x20}\x0a\x09.cf-col-3\x20{\x0a\x09\x09-ms-flex:\x200\x200\x2025%;\x0a\x09\x09flex:\x200\x200\x2025%;\x0a\x09\x09max-width:\x2025%;\x0a\x09}\x0a\x09.cf-push-3\x20{\x20margin-left:\x2025%;\x20}\x0a\x09.cf-col-4\x20{\x0a\x09\x09-ms-flex:\x200\x200\x2033.33333%;\x0a\x09\x09flex:\x200\x200\x2033.33333%;\x0a\x09\x09max-width:\x2033.33333%;\x0a\x09}\x0a\x09.cf-push-4\x20{\x20margin-left:\x2033.33333%;\x20}\x0a\x09.cf-col-5\x20{\x0a\x09\x09-ms-flex:\x200\x200\x2041.66667%;\x0a\x09\x09flex:\x200\x200\x2041.66667%;\x0a\x09\x09max-width:\x2041.66667%;\x0a\x09}\x0a\x09.cf-push-5\x20{\x20margin-left:\x2041.66667%;\x20}\x0a\x09.cf-col-6\x20{\x0a\x09\x09-ms-flex:\x200\x200\x2050%;\x0a\x09\x09flex:\x200\x200\x2050%;\x0a\x09\x09max-width:\x2050%;\x0a\x09}\x0a\x09.cf-push-6\x20{\x20margin-left:\x2050%;\x20}\x0a\x09.cf-col-7\x20{\x0a\x09\x09-ms-flex:\x200\x200\x2058.33333%;\x0a\x09\x09flex:\x200\x200\x2058.33333%;\x0a\x09\x09max-width:\x2058.33333%;\x0a\x09}\x0a\x09.cf-push-7\x20{\x20margin-left:\x2058.33333%;\x20}\x0a\x09.cf-col-8\x20{\x0a\x09\x09-ms-flex:\x200\x200\x2066.66667%;\x0a\x09\x09flex:\x200\x200\x2066.66667%;\x0a\x09\x09max-width:\x2066.66667%;\x0a\x09}\x0a\x09.cf-push-8\x20{\x20margin-left:\x2066.66667%;\x20}\x0a\x09.cf-col-9\x20{\x0a\x09\x09-ms-flex:\x200\x200\x2075%;\x0a\x09\x09flex:\x200\x200\x2075%;\x0a\x09\x09max-width:\x2075%;\x0a\x09}\x0a\x09.cf-push-9\x20{\x20margin-left:\x2075%;\x20}\x0a\x09.cf-col-10\x20{\x0a\x09\x09-ms-flex:\x200\x200\x2083.33333%;\x0a\x09\x09flex:\x200\x200\x2083.33333%;\x0a\x09\x09max-width:\x2083.33333%;\x0a\x09}\x0a\x09.cf-push-10\x20{\x20margin-left:\x2083.33333%;\x20}\x0a\x09.cf-col-11\x20{\x0a\x09\x09-ms-flex:\x200\x200\x2091.66667%;\x0a\x09\x09flex:\x200\x200\x2091.66667%;\x0a\x09\x09max-width:\x2091.66667%;\x0a\x09}\x0a\x09.cf-push-11\x20{\x20margin-left:\x2091.66667%;\x20}\x0a\x09.cf-col-12\x20{\x0a\x09\x09-ms-flex:\x200\x200\x20100%;\x0a\x09\x09flex:\x200\x200\x20100%;\x0a\x09\x09max-width:\x20100%;\x0a\x09}\x0a}','1/3','30GOIAzi','copyTooltip','opacity','full','474025sdPQKq','68341LWWcfB','data-tab','item-active','9019128ljEyZd','px,','97FDLnlO','target','paddingInput','catch','cssPreview','offsetHeight','input','cf-col-4','1287180qDZQrV','remove','cssOutput','px;\x0a}\x0a.cf-col-1,\x20.cf-col-2,\x20.cf-col-3,\x20.cf-col-4,\x20.cf-col-5,\x20.cf-col-6,\x20.cf-col-7,\x20.cf-col-8,\x20.cf-col-9,\x20.cf-col-10,\x20.cf-col-11,\x20.cf-col-12\x20{\x0a\x09position:\x20relative;\x0a\x09width:\x20100%;\x0a\x09min-height:\x201px;\x0a\x09padding-right:\x20','rect','writeText','modifiers','resizable','copyBtn','left','</b>','\x20\x20<div\x20class=\x22','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22field-controls\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<select\x20class=\x22size-selector\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x22full\x22\x20selected>Full</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x221/2\x22>1/2</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x221/3\x22>1/3</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x221/4\x22>1/4</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</select>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22delete-btn\x22\x20title=\x22Delete\x20Field\x22>&times;</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22field-label\x22>CF7\x20Field:\x20<b>Full</b></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','px)','.delete-btn','data-size','innerHTML','height','data-y','restrictSize','.field-label','addEventListener','forEach','.cf7-field','getElementById','htmlOutput','2111940zZtaKD','appendChild','getAttribute','getBoundingClientRect','div','querySelector','click','classList','</div>\x0a','deltaRect','createElement','innerText','7370mrpHzf','translate(','data-x','1/4','transform','#cf7_layout_generator'];_0xfe8b=function(){return _0x4b1a60;};return _0xfe8b();}
+  </script>
+</body>
+</html>

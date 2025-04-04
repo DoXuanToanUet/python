@@ -95,7 +95,7 @@
       font-weight: bold;
       color: #64748B;
     }
-    .form-group input[type="text"],
+    .form-group input[type="text"],.form-group input[type="number"],
     .form-group select {
         display: block;
     width: 100%;
@@ -110,11 +110,11 @@
     border-radius: 10px;
     transition: .2s ease-in-out;
     }
-    .form-group input[type="text"]:focus,
+    .form-group input:focus,
     .form-group select:focus{
         border: 1px solid #b3beca;
     } 
-    .form-group input[type="text"]:focus-visible,
+    .form-group input[type="text"]:focus-visible,.form-group input[type="number"],
     .form-group select:focus-visible{
         border: 1px solid #939ca7;
         outline: none;
@@ -419,19 +419,19 @@
             <h4>Pagination Parameters</h4>
             <div class="form-group">
               <label for="posts_per_page">Posts per page</label>
-              <input type="text" id="posts_per_page" placeholder="Number of posts to show per page">
+              <input type="number" id="posts_per_page" placeholder="Number of posts to show per page">
             </div>
             <div class="form-group">
               <label for="offset">Offset</label>
-              <input type="text" id="offset" placeholder="Number of posts to pass over">
+              <input type="number" id="offset" placeholder="Number of posts to pass over">
             </div>
             <div class="form-group">
               <label for="paged">Paged</label>
-              <input type="text" id="paged" placeholder="Number of page">
+              <input type="number" id="paged" placeholder="Number of page">
             </div>
             <div class="form-group">
               <label for="page">Page</label>
-              <input type="text" id="page" placeholder="Page number for static front page">
+              <input type="number" id="page" placeholder="Page number for static front page">
             </div>
             <div class="form-group checkbox">
               <input type="checkbox" id="ignore_sticky_posts">

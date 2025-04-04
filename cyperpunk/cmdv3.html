@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Mô Phỏng Tìm Mật Khẩu Windows 11</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      height: 100vh;
+      background-image: url('https://laaouatni.github.io/w11CSS/images/1dark.jpg');
+      background-size: cover;
+      background-color: #0078D7;
+      overflow: hidden;
+    }
+    
+    #desktop {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #taskbar {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 48px;
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    
+    #start-button {
+      width: 40px;
+      height: 40px;
+      background-color: transparent;
+      color: #0078D7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin: 0 4px;
+      border-radius: 4px;
+    }
+
+    #start-button:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .taskbar-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin: 0 2px;
+      border-radius: 4px;
+    }
+
+    .taskbar-icon:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    #taskbar-right {
+      position: absolute;
+      right: 10px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 80px);
+      grid-auto-rows: 90px;
+      gap: 10px;
+      padding: 20px;
+    }
+    
+    .desktop-icon {
+      width: 80px;
+      height: 90px;
+      text-align: center;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px;
+      border-radius: 5px;
+    }
+    
+    .desktop-icon:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .icon-img {
+      width: 45px;
+      height: 45px;
+      background-color: transparent;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      overflow: hidden;
+    }
+    
+    .icon-label {
+      font-size: 12px;
+      width: 100%;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+    
+    .window {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 8px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 100;
+      overflow: hidden;
+    }
+    
+    #cmd-window {
+      width: 650px;
+      height: 450px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      background-color: rgba(12, 12, 12, 0.95);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #cmd-titlebar {
+      background-color: rgba(32, 32, 32, 0.95);
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      color: white;
+      font-size: 12px;
+    }
+    
+    #cmd-content {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 15px;
+      white-space: pre-wrap;
+      font-size: 14px;
+    }
+    
+    #cmd-input {
+      display: flex;
+      width: 100%;
+      background: transparent;
+      color: white;
+      border: none;
+      outline: none;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      padding: 5px 15px;
+      font-size: 14px;
+    }
+    
+    #chrome-window {
+      width: 850px;
+      height: 600px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #chrome-titlebar {
+      background-color: #f1f3f4;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      border-radius: 8px 8px 0 0;
+    }
+    
+    #chrome-controls {
+      display: flex;
+      gap: 8px;
+    }
+    
+    #chrome-controls span {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+      cursor: pointer;
+    }
+    
+    .chrome-close {
+      background-color: #ff5f56;
+    }
+    
+    .chrome-minimize {
+      background-color: #ffbd2e;
+    }
+    
+    .chrome-maximize {
+      background-color: #27c93f;
+    }
+    
+    #chrome-content {
+      height: calc(100% - 36px);
+      padding: 20px;
+      overflow-y: auto;
+      background-color: white;
+    }
+
+    #chrome-content h3 {
+      margin-bottom: 15px;
+      color: #1a73e8;
+    }
+
+    #chrome-content p {
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    #chrome-content ol {
+      margin-left: 20px;
+      margin-bottom: 15px;
+    }
+
+    #chrome-content li {
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    #chrome-content code {
+      background-color: #f1f3f4;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      color: #d14;
+    }
+    
+    .window-title {
+      flex-grow: 1;
+      text-align: center;
+      font-size: 14px;
+    }
+    
+    .window-controls {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .control-btn {
+      cursor: pointer;
+      color: #ddd;
+      font-weight: bold;
+    }
+    
+    .control-btn:hover {
+      color: white;
+    }
+    
+    .close-btn {
+      color: #ddd;
+      cursor: pointer;
+    }
+    
+    .close-btn:hover {
+      color: #ff5f5f;
+    }
+    
+    #password-hint {
+      position: fixed;
+      bottom: 60px;
+      right: 20px;
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      color: #0078D7;
+      padding: 12px 15px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      font-size: 14px;
+      display: none;
+      z-index: 500;
+      max-width: 300px;
+    }
+    
+    #win-notification {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      color: #202020;
+      padding: 25px;
+      border-radius: 10px;
+      text-align: center;
+      display: none;
+      z-index: 1001;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      width: 350px;
+    }
+    
+    #win-notification h2 {
+      color: #0078D7;
+      margin-bottom: 15px;
+    }
+    
+    #win-notification p {
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    
+    #win-notification strong {
+      color: #0078D7;
+      font-size: 18px;
+      background-color: #f0f0f0;
+      padding: 5px 10px;
+      border-radius: 4px;
+      display: inline-block;
+      margin: 10px 0;
+    }
+    
+    #win-notification button {
+      background-color: #0078D7;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+    
+    #win-notification button:hover {
+      background-color: #0067b8;
+    }
+    
+    #date-time {
+      font-size: 12px;
+      color: #202020;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 10px;
+    }
+    
+    @keyframes notification-pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .pulse {
+      animation: notification-pulse 2s infinite;
+    }
+    
+    .file-explorer-icon {
+      background-color: #ffc83d;
+      border-radius: 0;
+      position: relative;
+    }
+    
+    .recycle-bin-icon {
+      background-color: transparent;
+    }
+    
+    .edge-icon, .chrome-icon {
+      background-color: transparent;
+    }
+    
+    .taskbar-divider {
+      width: 1px;
+      height: 20px;
+      background-color: #e0e0e0;
+      margin: 0 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="desktop">
+    <div class="icon-grid">
+      <div class="desktop-icon" onclick="openWindow('cmd-window')">
+        <div class="icon-img">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+            <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+          </svg>
+        </div>
+        <div class="icon-label">Command Prompt</div>
+      </div>
+      
+      <div class="desktop-icon" onclick="openWindow('chrome-window')">
+        <div class="icon-img chrome-icon">
+          
+          <?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+<path fill="#FFFFFF" d="M255.73,383.71c70.3,0,127.3-56.99,127.3-127.3s-56.99-127.3-127.3-127.3s-127.3,56.99-127.3,127.3
+	S185.42,383.71,255.73,383.71z"/>
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="283.2852" y1="18.9008" x2="62.8264" y2="400.7473" gradientTransform="matrix(1 0 0 -1 0 514)">
+	<stop  offset="0" style="stop-color:#1E8E3E"/>
+	<stop  offset="1" style="stop-color:#34A853"/>
+</linearGradient>
+<path fill="url(#SVGID_1_)" d="M145.48,320.08L35.26,129.17c-22.35,38.7-34.12,82.6-34.12,127.29s11.76,88.59,34.11,127.29
+	c22.35,38.7,54.49,70.83,93.2,93.17c38.71,22.34,82.61,34.09,127.3,34.08l110.22-190.92v-0.03c-11.16,19.36-27.23,35.44-46.58,46.62
+	c-19.35,11.18-41.3,17.07-63.65,17.07s-44.3-5.88-63.66-17.05C172.72,355.52,156.65,339.44,145.48,320.08z"/>
+<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="218.5901" y1="2.3333" x2="439.0491" y2="384.1796" gradientTransform="matrix(1 0 0 -1 0 514)">
+	<stop  offset="0" style="stop-color:#FCC934"/>
+	<stop  offset="1" style="stop-color:#FBBC04"/>
+</linearGradient>
+<path fill="url(#SVGID_2_)" d="M365.96,320.08L255.74,510.99c44.69,0.01,88.59-11.75,127.29-34.1
+	c38.7-22.34,70.84-54.48,93.18-93.18c22.34-38.7,34.1-82.61,34.09-127.3c-0.01-44.69-11.78-88.59-34.14-127.28H255.72l-0.03,0.02
+	c22.35-0.01,44.31,5.86,63.66,17.03c19.36,11.17,35.43,27.24,46.61,46.59c11.18,19.35,17.06,41.31,17.06,63.66
+	C383.03,278.77,377.14,300.72,365.96,320.08L365.96,320.08z"/>
+<path fill="#1A73E8" d="M255.73,357.21c55.66,0,100.78-45.12,100.78-100.78s-45.12-100.78-100.78-100.78
+	s-100.78,45.12-100.78,100.78S200.07,357.21,255.73,357.21z"/>
+<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="35.2587" y1="353.0303" x2="476.177" y2="353.0303" gradientTransform="matrix(1 0 0 -1 0 514)">
+	<stop  offset="0" style="stop-color:#D93025"/>
+	<stop  offset="1" style="stop-color:#EA4335"/>
+</linearGradient>
+<path fill="url(#SVGID_3_)" d="M255.73,129.14h220.45C453.84,90.43,421.7,58.29,383,35.95C344.3,13.6,300.4,1.84,255.71,1.84
+	c-44.69,0-88.59,11.77-127.29,34.12c-38.7,22.35-70.83,54.5-93.16,93.2l110.22,190.92l0.03,0.02
+	c-11.18-19.35-17.08-41.3-17.08-63.65s5.87-44.31,17.04-63.66c11.17-19.36,27.24-35.43,46.6-46.6
+	C211.42,135.01,233.38,129.13,255.73,129.14z"/>
+</svg>
+
+        </div>
+        <div class="icon-label">Google Chrome</div>
+      </div>
+      
+      <div class="desktop-icon">
+        <div class="icon-img file-explorer-icon">
+          <!-- <svg width="25" height="25" viewBox="0 0 24 24" fill="#0078D7">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z"/>
+            <path d="M4 6h16v3H4z" fill="#0078D7"/>
+          </svg> -->
+          <img src="https://win11.blueedge.me/img/icon/explorer.png" alt="" style="width:36px; height: 36px;">
+        </div>
+        <div class="icon-label">File Explorer</div>
+      </div>
+      
+      <div class="desktop-icon">
+        <div class="icon-img edge-icon">
+          <svg width="35" height="35" viewBox="0 0 24 24" fill="#0078D7">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+          </svg>
+        </div>
+        <div class="icon-label">Microsoft Edge</div>
+      </div>
+      
+      <div class="desktop-icon">
+        <div class="icon-img recycle-bin-icon">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+          </svg>
+        </div>
+        <div class="icon-label">Recycle Bin</div>
+      </div>
+    </div>
+    
+    <div id="taskbar">
+      <div id="start-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#0078D7">
+          <path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,-2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z"></path>
+        </svg>
+      </div>
+      <div class="taskbar-icon" onclick="openWindow('cmd-window')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#333">
+          <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+        </svg>
+      </div>
+      <div class="taskbar-icon" onclick="openWindow('chrome-window')">
+        <svg width="24" height="24" viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="12" fill="#4285F4"/>
+          <circle cx="24" cy="24" r="4" fill="white"/>
+          <path d="M24 16V24" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <path d="M21 18L26 28" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <path d="M27 18L22 28" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="taskbar-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#0078D7">
+          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z"/>
+        </svg>
+      </div>
+      <div class="taskbar-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#0078D7">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+        </svg>
+      </div>
+      
+      <div id="taskbar-right">
+        <div class="taskbar-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#555">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+        </div>
+        <div class="taskbar-divider"></div>
+        <div id="date-time">
+          <span id="time">12:30 PM</span>
+          <span id="date">4/4/2025</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cmd-window" class="window">
+    <div id="cmd-titlebar">
+      <span class="window-title">Command Prompt</span>
+      <div class="window-controls">
+        <span class="control-btn">—</span>
+        <span class="control-btn">□</span>
+        <span class="close-btn" onclick="closeWindow('cmd-window')">×</span>
+      </div>
+    </div>
+    <div id="cmd-content">Microsoft Windows [Version 10.0.22000.1]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\Admin></div>
+    <input id="cmd-input" type="text" autofocus onkeypress="handleCommand(event)">
+  </div>
+
+  <div id="chrome-window" class="window">
+    <div id="chrome-titlebar">
+      <div id="chrome-controls">
+        <span class="chrome-close" onclick="closeWindow('chrome-window')"></span>
+        <span class="chrome-minimize"></span>
+        <span class="chrome-maximize"></span>
+      </div>
+      <div class="window-title">Hướng dẫn tìm mật khẩu Windows - Google Chrome</div>
+    </div>
+    <div id="chrome-content">
+      <h3>Hướng dẫn tìm mật khẩu trên Windows 11</h3>
+      <p>Để tìm mật khẩu được lưu trữ trong Windows 11, bạn có thể sử dụng các lệnh sau trong Command Prompt:</p>
+      <ol>
+        <li>Đầu tiên, kiểm tra danh sách người dùng bằng lệnh: <code>net user</code></li>
+        <li>Sau đó, kiểm tra thông tin chi tiết về một người dùng cụ thể, ví dụ: <code>net user Administrator</code></li>
+        <li>Sử dụng công cụ Cipher để liệt kê các tệp đã mã hóa: <code>cipher /c</code></li>
+        <li>Tìm kiếm các tệp mật khẩu trong thư mục hệ thống: <code>dir /s passwords.txt</code></li>
+        <li>Đối với các mật khẩu Wi-Fi đã lưu: <code>netsh wlan show profile</code> và sau đó <code>netsh wlan show profile name="TenWifi" key=clear</code></li>
+        <li>Kiểm tra các dịch vụ đang chạy: <code>tasklist</code></li>
+        <li>Tìm kiếm trong thư mục ẩn: <code>dir /a:h</code></li>
+        <li>Kiểm tra thư mục Documents: <code>cd C:\Users\Admin\Documents</code> rồi <code>dir</code></li>
+        <li>Kiểm tra các tiến trình đang chạy với quyền admin: <code>tasklist /v</code></li>
+      </ol>
+      <p>Lưu ý: Các lệnh trên chỉ hoạt động khi bạn có quyền truy cập phù hợp vào hệ thống.</p>
+    </div>
+  </div>
+  
+  <div id="password-hint" class="pulse">
+    Gợi ý: Kiểm tra tệp ẩn trong thư mục Documents!
+  </div>
+  
+  <div id="win-notification">
+    <h2>CHÚC MỪNG!</h2>
+    <p>Bạn đã tìm thấy mật khẩu:</p>
+    <strong id="found-password">Win11Security2025</strong>
+    <p>Mật khẩu này có thể được sử dụng để đăng nhập vào tài khoản người dùng.</p>
+    <button onclick="resetGame()">Chơi lại</button>
+  </div>
+
+  <script>
+    // Game variables
+let cmdHistory = [];
+let historyIndex = -1;
+let currentPath = "C:\\Users\\Admin";
+let gameProgress = 0;
+let passwordFound = false;
+
+// Constants
+const password = "Win11Security2025";
+const secretFiles = {
+  "C:\\Users\\Admin\\Documents": ["secret.txt"],
+  "C:\\Users\\Admin\\AppData\\Roaming": ["passwords.dat"]
+};
+
+// Set date and time
+function updateDateTime() {
+  const now = new Date();
+  let hours = now.getHours();
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  const year = now.getFullYear();
+  
+  document.getElementById('time').textContent = `${hours}:${minutes} ${ampm}`;
+  document.getElementById('date').textContent = `${month}/${day}/${year}`;
+}
+
+function openWindow(windowId) {
+  document.getElementById(windowId).style.display = "flex";
+  if (windowId === 'cmd-window') {
+    document.getElementById('cmd-input').focus();
+  }
+}
+
+function closeWindow(windowId) {
+  document.getElementById(windowId).style.display = "none";
+}
+
+function appendToCmdContent(text) {
+  const cmdContent = document.getElementById('cmd-content');
+  cmdContent.innerHTML += text;
+  cmdContent.scrollTop = cmdContent.scrollHeight;
+  return cmdContent;
+}
+
+function handleCommand(event) {
+  if (event.key === 'Enter') {
+    const input = document.getElementById('cmd-input');
+    const command = input.value.trim();
+    
+    if (command) {
+      cmdHistory.push(command);
+      historyIndex = cmdHistory.length;
+      
+      appendToCmdContent(`${currentPath}>${command}\n`);
+      
+      processCommand(command);
+      
+      input.value = '';
+    }
+  } else if (event.key === 'ArrowUp') {
+    navigateHistory(-1);
+    event.preventDefault();
+  } else if (event.key === 'ArrowDown') {
+    navigateHistory(1);
+    event.preventDefault();
+  }
+}
+
+function navigateHistory(direction) {
+  if (cmdHistory.length === 0) return;
+  
+  historyIndex += direction;
+  
+  if (historyIndex < 0) historyIndex = 0;
+  if (historyIndex > cmdHistory.length) historyIndex = cmdHistory.length;
+  
+  const input = document.getElementById('cmd-input');
+  if (historyIndex === cmdHistory.length) {
+    input.value = '';
+  } else {
+    input.value = cmdHistory[historyIndex];
+  }
+}
+
+function processCommand(command) {
+  const cmdLower = command.toLowerCase();
+  const args = command.split(' ');
+  const cmd = args[0].toLowerCase();
+  
+  switch(cmd) {
+    case 'help':
+      showHelp();
+      break;
+    case 'dir':
+      showDirectory(args);
+      break;
+    case 'cd':
+      changeDirectory(args);
+      break;
+    case 'cls':
+      clearScreen();
+      break;
+    case 'type':
+      typeFile(args);
+      break;
+    case 'net':
+      handleNetCommand(args);
+      break;
+    case 'netsh':
+      handleNetshCommand(args);
+      break;
+    case 'tasklist':
+      showTasklist(args);
+      break;
+    case 'cipher':
+      showCipher(args);
+      break;
+    default:
+      appendToCmdContent(`'${command}' không được nhận dạng là lệnh nội bộ hoặc bên ngoài, một chương trình có thể thực thi hoặc tệp batch.\n`);
+  }
+  
+  appendToCmdContent(`${currentPath}>`);
+}
+
+function showHelp() {
+  appendToCmdContent(`
+Các lệnh phổ biến:
+  DIR        Hiển thị danh sách tệp và thư mục
+  CD         Thay đổi thư mục hiện tại
+  CLS        Xóa màn hình
+  TYPE       Hiển thị nội dung của một tệp văn bản
+  NET USER   Hiển thị thông tin người dùng
+  NETSH      Công cụ cấu hình mạng
+  TASKLIST   Hiển thị các ứng dụng và dịch vụ đang chạy
+  CIPHER     Hiển thị hoặc thay đổi mã hóa tệp và thư mục
+\n`);
+}
+
+function showDirectory(args) {
+  let showHidden = false;
+  
+  // Kiểm tra tham số /a:h để hiển thị tệp ẩn
+  if (args.includes('/a:h')) {
+    showHidden = true;
+  }
+  
+  let searchTerm = null;
+  // Kiểm tra lệnh dir /s để tìm kiếm tệp
+  if (args.includes('/s') && args.length > 2) {
+    searchTerm = args[args.length - 1];
+  }
+  
+  if (searchTerm && searchTerm.toLowerCase() === 'passwords.txt') {
+    appendToCmdContent(`
+Tìm kiếm tệp passwords.txt trong ${currentPath} và các thư mục con...
+
+Không tìm thấy tệp nào khớp với yêu cầu.
+\n`);
+    return;
+  }
+  
+  // Default directory listing
+  const folders = [];
+  const files = [];
+  
+  // Add default directories based on current path
+  if (currentPath.includes("C:\\Users\\Admin")) {
+    folders.push("Desktop", "Documents", "Downloads", "Pictures", "Music", "Videos");
+    if (currentPath === "C:\\Users\\Admin") {
+      folders.push("AppData");
+    }
+    if (currentPath === "C:\\Users\\Admin\\AppData") {
+      folders.push("Local", "Roaming", "LocalLow");
+    }
+  }
+  
+  // Add files based on current path and whether to show hidden files
+  if (secretFiles[currentPath]) {
+    for (const file of secretFiles[currentPath]) {
+      if (file.startsWith('.') && !showHidden) {
+        // Skip hidden files unless /a:h parameter is provided
+        continue;
+      }
+      files.push(file);
+    }
+  }
+  
+  // Add the "secret" hidden file only when using /a:h flag in Documents folder
+  if (currentPath === "C:\\Users\\Admin\\Documents" && showHidden) {
+    files.push(".hidden_password.txt");
+    // Show the password hint when user discovers hidden files
+    document.getElementById('password-hint').style.display = 'block';
+    gameProgress = Math.max(gameProgress, 1);
+  }
+  
+  // Format output
+  appendToCmdContent(`\n Thư mục của ${currentPath}\n\n`);
+  
+  // Add parent directory
+  appendToCmdContent(`${formatDate(new Date())} <DIR>          .\n`);
+  appendToCmdContent(`${formatDate(new Date())} <DIR>          ..\n`);
+  
+  // Add folders
+  for (const folder of folders) {
+    appendToCmdContent(`${formatDate(new Date())} <DIR>          ${folder}\n`);
+  }
+  
+  // Add files
+  for (const file of files) {
+    const fileSize = file.includes('password') ? 24 : Math.floor(Math.random() * 10000);
+    appendToCmdContent(`${formatDate(new Date())}        ${fileSize} ${file}\n`);
+  }
+  
+  appendToCmdContent(`\n              ${folders.length + 2} thư mục\n`);
+  appendToCmdContent(`              ${files.length} tệp tin\n`);
+  appendToCmdContent(`              ${files.reduce((acc, f) => acc + (f.includes('password') ? 24 : Math.floor(Math.random() * 10000)), 0)} byte\n\n`);
+}
+
+function formatDate(date) {
+  return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}  ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+}
+
+function changeDirectory(args) {
+  if (args.length < 2) {
+    appendToCmdContent(`${currentPath}\n\n`);
+    return;
+  }
+  
+  const newPath = args[1].trim();
+  
+  if (newPath === '..') {
+    // Navigate up one level
+    const pathParts = currentPath.split('\\');
+    if (pathParts.length > 1) {
+      pathParts.pop();
+      currentPath = pathParts.join('\\');
+    }
+    appendToCmdContent('\n');
+    return;
+  }
+  
+  // Handle absolute paths
+  if (newPath.startsWith('C:\\')) {
+    if (newPath.startsWith('C:\\Users\\Admin')) {
+      currentPath = newPath;
+    } else {
+      appendToCmdContent(`Truy cập bị từ chối: ${newPath}\n\n`);
+    }
+    return;
+  }
+  
+  // Handle relative paths
+  if (currentPath === 'C:\\Users\\Admin' && newPath === 'Documents') {
+    currentPath = 'C:\\Users\\Admin\\Documents';
+  } else if (currentPath === 'C:\\Users\\Admin' && newPath === 'AppData') {
+    currentPath = 'C:\\Users\\Admin\\AppData';
+  } else if (currentPath === 'C:\\Users\\Admin\\AppData' && (newPath === 'Roaming' || newPath === 'Local' || newPath === 'LocalLow')) {
+    currentPath = `C:\\Users\\Admin\\AppData\\${newPath}`;
+  } else if (['Desktop', 'Downloads', 'Pictures', 'Music', 'Videos'].includes(newPath) && currentPath === 'C:\\Users\\Admin') {
+    currentPath = `C:\\Users\\Admin\\${newPath}`;
+  } else if (newPath.toLowerCase() === 'c:') {
+    currentPath = 'C:';
+  } else if (newPath.toLowerCase() === 'users' && currentPath === 'C:') {
+    currentPath = 'C:\\Users';
+  } else if (newPath.toLowerCase() === 'admin' && currentPath === 'C:\\Users') {
+    currentPath = 'C:\\Users\\Admin';
+  } else {
+    appendToCmdContent(`Thư mục không tồn tại: ${currentPath}\\${newPath}\n`);
+  }
+  
+  appendToCmdContent('\n');
+}
+
+function clearScreen() {
+  document.getElementById('cmd-content').innerHTML = `Microsoft Windows [Version 10.0.22000.1]
+(c) Microsoft Corporation. All rights reserved.
+
+`;
+}
+
+function typeFile(args) {
+  if (args.length < 2) {
+    appendToCmdContent(`Cú pháp của lệnh không đúng.\n\n`);
+    return;
+  }
+  
+  const fileName = args[1].toLowerCase();
+  
+  if (currentPath === 'C:\\Users\\Admin\\Documents' && fileName === '.hidden_password.txt') {
+    appendToCmdContent(`
+=== MẬT KHẨU NGƯỜI DÙNG ===
+User: Admin
+Pass: ${password}
+=========================
+\n`);
+    passwordFound = true;
+    gameProgress = 2;
+    
+    // Show winning notification
+    setTimeout(() => {
+      document.getElementById('win-notification').style.display = 'block';
+      document.getElementById('found-password').textContent = password;
+    }, 1000);
+    
+    return;
+  }
+  
+  if (currentPath === 'C:\\Users\\Admin\\AppData\\Roaming' && fileName === 'passwords.dat') {
+    appendToCmdContent(`
+[ERROR] Không thể hiển thị nội dung của tệp nhị phân.
+\n`);
+    return;
+  }
+  
+  if (secretFiles[currentPath] && secretFiles[currentPath].includes(fileName)) {
+    if (fileName === 'secret.txt') {
+      appendToCmdContent(`
+Ghi chú quan trọng:
+Các tệp ẩn có thể được tìm thấy bằng lệnh "dir /a:h"
+\n`);
+      return;
+    }
+  }
+  
+  appendToCmdContent(`Không thể tìm thấy tệp: ${fileName}\n\n`);
+}
+
+function handleNetCommand(args) {
+  if (args.length < 2) {
+    appendToCmdContent(`Cú pháp của lệnh NET không đúng.\n\n`);
+    return;
+  }
+  
+  const subCommand = args[1].toLowerCase();
+  
+  if (subCommand === 'user') {
+    if (args.length < 3) {
+      appendToCmdContent(`
+Tên người dùng                 Tên đầy đủ           Nhận xét
+-------------------------------------------------------------------------------
+Administrator            Quản trị viên         Tài khoản được tích hợp sẵn
+Guest                    Khách                 Tài khoản được tích hợp sẵn
+Admin                    Admin                 Người dùng hiện tại
+
+Lệnh đã hoàn tất thành công.
+\n`);
+    } else {
+      const username = args[2].toLowerCase();
+      if (username === 'administrator' || username === 'admin') {
+        appendToCmdContent(`
+Tên người dùng                    ${username === 'administrator' ? 'Administrator' : 'Admin'}
+Tên đầy đủ                       ${username === 'administrator' ? 'Quản trị viên' : 'Admin'}
+Nhận xét                         ${username === 'administrator' ? 'Tài khoản được tích hợp sẵn' : 'Người dùng hiện tại'}
+Mã quốc gia                      000 (Hệ thống mặc định)
+Tài khoản hoạt động              Có
+Tài khoản hết hạn                Không bao giờ
+
+Ngày thay đổi mật khẩu gần nhất  4/1/2025 9:15 AM
+Mật khẩu hết hạn                 Không bao giờ
+Thay đổi mật khẩu được phép      Có
+Thời gian đăng nhập              Tất cả
+
+Thư mục chính                    C:\\Users\\${username === 'administrator' ? 'Administrator' : 'Admin'}
+Script đăng nhập cuối cùng       
+Hồ sơ người dùng                 
+
+Được phép trạm làm việc          Tất cả
+Hết giờ làm việc                 Không có
+Ngày hết hạn tài khoản           Không bao giờ
+Các đặc quyền                    *Quản trị viên
+
+Lệnh đã hoàn tất thành công.
+\n`);
+      } else if (username === 'guest') {
+        appendToCmdContent(`
+Tên người dùng                    Guest
+Tên đầy đủ                       Khách
+Nhận xét                         Tài khoản được tích hợp sẵn
+Mã quốc gia                      000 (Hệ thống mặc định)
+Tài khoản hoạt động              Không
+Tài khoản hết hạn                Không bao giờ
+
+Lệnh đã hoàn tất thành công.
+\n`);
+      } else {
+        appendToCmdContent(`Lỗi 2221: Không tìm thấy tên người dùng.\n\n`);
+      }
+    }
+  } else {
+    appendToCmdContent(`Lệnh NET không hợp lệ.\n\n`);
+  }
+}
+
+function handleNetshCommand(args) {
+  if (args.length < 3) {
+    appendToCmdContent(`Cú pháp của lệnh NETSH không đúng.\n\n`);
+    return;
+  }
+  
+  const subCommand = args[1].toLowerCase();
+  
+  if (subCommand === 'wlan') {
+    const wlanCommand = args[2].toLowerCase();
+    
+    if (wlanCommand === 'show') {
+      const showCommand = args[3] ? args[3].toLowerCase() : '';
+      
+      if (showCommand === 'profile') {
+        appendToCmdContent(`
+Hồ sơ trên giao diện Wi-Fi:
+
+Nhóm chính: Các hồ sơ tự động
+    Tên hồ sơ            : HomeWiFi
+    Tên hồ sơ            : OfficeNetwork
+    Tên hồ sơ            : AndroidAP
+\n`);
+      } else if (showCommand === 'profiles' && args.length >= 5 && args[4].includes('name=')) {
+        const profileName = args[4].split('=')[1].replace(/"/g, '');
+        const showKey = args.length >= 6 && args[5].toLowerCase() === 'key=clear';
+        
+        appendToCmdContent(`
+Hồ sơ ${profileName} trên giao diện Wi-Fi:
+=======================================================================
+
+Áp dụng tới        : Kết nối mạng tất cả người dùng
+Tên hồ sơ          : ${profileName}
+Cài đặt người dùng
+    Chế độ          : Tự động
+    SSID            : "${profileName}"
+    Loại mạng       : Truy cập Internet
+Cài đặt kết nối
+    Chế độ          : Tự động kết nối
+    Số lượng SSID   : 1
+    SSID_NAME       : "${profileName}"
+    Loại mạng       : Hạ tầng
+Cài đặt bảo mật
+    Kiểu xác thực   : WPA2-Personal
+    Mã hóa         : CCMP
+${showKey ? '    Nội dung khóa     : ' + (profileName === 'OfficeNetwork' ? 'Office@2025' : (profileName === 'HomeWiFi' ? 'MySecureHome2025' : 'Mobile2025')) : ''}
+\n`);
+      } else {
+        appendToCmdContent(`Cú pháp của lệnh NETSH không đúng.\n\n`);
+      }
+    } else {
+      appendToCmdContent(`Cú pháp của lệnh NETSH không đúng.\n\n`);
+    }
+  } else {
+    appendToCmdContent(`Cú pháp của lệnh NETSH không đúng.\n\n`);
+  }
+}
+
+function showTasklist(args) {
+  const useV = args.includes('/v');
+  
+  appendToCmdContent(`
+Tên tác vụ                     PID      ${useV ? 'Tên phiên     Phiên#    Mem Usage Status      User        CPU Time' : 'Sử dụng bộ nhớ'}
+========================= ======== ${useV ? '============= ========== =========== ============ =========== =============' : '============'}
+System Idle Process              0 ${useV ? 'Services             0        8K Running              0:03:12' : '        8K'}
+System                           4 ${useV ? 'Services             0    2.268K Running      SYSTEM    0:00:30' : '    2.268K'}
+Registry                       104 ${useV ? 'Services             0   42.704K Running      SYSTEM    0:00:05' : '   42.704K'}
+smss.exe                       380 ${useV ? 'Services             0    1.168K Running      SYSTEM    0:00:01' : '    1.168K'}
+csrss.exe                      668 ${useV ? 'Services             0    4.608K Running      SYSTEM    0:00:05' : '    4.608K'}
+wininit.exe                    760 ${useV ? 'Services             0    7.024K Running      SYSTEM    0:00:00' : '    7.024K'}
+csrss.exe                      772 ${useV ? 'Console              1    5.544K Running      SYSTEM    0:00:09' : '    5.544K'}
+services.exe                   844 ${useV ? 'Services             0    8.644K Running      SYSTEM    0:00:16' : '    8.644K'}
+winlogon.exe                   876 ${useV ? 'Console              1   12.212K Running      SYSTEM    0:00:02' : '   12.212K'}
+svchost.exe                    632 ${useV ? 'Services             0   29.348K Running      SYSTEM    0:00:40' : '   29.348K'}
+fontdrvhost.exe                984 ${useV ? 'Services             0    3.724K Running      SYSTEM    0:00:00' : '    3.724K'}
+fontdrvhost.exe                992 ${useV ? 'Console              1    9.420K Running      SYSTEM    0:00:00' : '    9.420K'}
+svchost.exe                    456 ${useV ? 'Services             0   23.232K Running      SYSTEM    0:00:26' : '   23.232K'}
+dwm.exe                        548 ${useV ? 'Console              1  120.436K Running      SYSTEM    0:03:30' : '  120.436K'}
+svchost.exe                    816 ${useV ? 'Services             0   43.952K Running      SYSTEM    0:00:46' : '   43.952K'}
+svchost.exe                   1176 ${useV ? 'Services             0   27.016K Running      NETWORK S  0:00:16' : '   27.016K'}
+svchost.exe                   1220 ${useV ? 'Services             0   17.344K Running      SYSTEM    0:00:08' : '   17.344K'}
+svchost.exe                   1256 ${useV ? 'Services             0   31.456K Running      SYSTEM    0:00:17' : '   31.456K'}
+svchost.exe                   1352 ${useV ? 'Services             0   11.580K Running      SYSTEM    0:00:03' : '   11.580K'}
+svchost.exe                   1360 ${useV ? 'Services             0   27.296K Running      SYSTEM    0:00:12' : '   27.296K'}
+svchost.exe                   1436 ${useV ? 'Services             0   14.640K Running      SYSTEM    0:00:04' : '   14.640K'}
+svchost.exe                   1468 ${useV ? 'Services             0   17.216K Running      SYSTEM    0:00:05' : '   17.216K'}
+svchost.exe                   1500 ${useV ? 'Services             0   11.784K Running      SYSTEM    0:00:02' : '   11.784K'}
+svchost.exe                   1536 ${useV ? 'Services             0   14.568K Running      SYSTEM    0:00:03' : '   14.568K'}
+svchost.exe                   1560 ${useV ? 'Services             0   17.332K Running      SYSTEM    0:00:10' : '   17.332K'}
+svchost.exe                   1616 ${useV ? 'Services             0   22.144K Running      SYSTEM    0:00:08' : '   22.144K'}
+spoolsv.exe                   1756 ${useV ? 'Services             0   18.692K Running      SYSTEM    0:00:06' : '   18.692K'}
+svchost.exe                   1876 ${useV ? 'Services             0   22.936K Running      SYSTEM    0:00:13' : '   22.936K'}
+svchost.exe                   1904 ${useV ? 'Services             0   25.724K Running      SYSTEM    0:00:29' : '   25.724K'}
+svchost.exe                   1920 ${useV ? 'Services             0   14.512K Running      SYSTEM    0:00:04' : '   14.512K'}
+svchost.exe                   1936 ${useV ? 'Services             0   19.964K Running      SYSTEM    0:00:12' : '   19.964K'}
+svchost.exe                   1252 ${useV ? 'Services             0   15.064K Running      SYSTEM    0:00:05' : '   15.064K'}
+svchost.exe                   2124 ${useV ? 'Services             0   23.008K Running      LOCAL SER  0:00:04' : '   23.008K'}
+explorer.exe                  4996 ${useV ? 'Console              1  182.376K Running      Admin      0:02:24' : '  182.376K'}
+RAVCpl64.exe                  5184 ${useV ? 'Console              1   16.428K Running      Admin      0:00:01' : '   16.428K'}
+cmd.exe                       6516 ${useV ? 'Console              1    4.424K Running      Admin      0:00:00' : '    4.424K'}
+\n`);
+}
+
+function showCipher(args) {
+  if (args.length >= 2 && args[1] === '/c') {
+    appendToCmdContent(`
+Liệt kê mã hóa tệp trong C:\\Users\\Admin
+
+Tệp không có EFS hợp lệ: C:\\Users\\Admin\\Desktop\\Project Plan.docx
+Tệp không có EFS hợp lệ: C:\\Users\\Admin\\Documents\\Budget 2025.xlsx
+Tệp không có EFS hợp lệ: C:\\Users\\Admin\\Documents\\Report.docx
+Tệp không có EFS hợp lệ: C:\\Users\\Admin\\Documents\\Meeting Notes.txt
+Tệp được mã hóa: C:\\Users\\Admin\\Documents\\.hidden_password.txt
+Tệp không có EFS hợp lệ: C:\\Users\\Admin\\Pictures\\Vacation.jpg
+Tệp không có EFS hợp lệ: C:\\Users\\Admin\\Downloads\\Setup.exe
+
+Tổng số tệp được chỉ định: 7
+Tệp được mã hóa: 1
+Tệp không có EFS hợp lệ: 6
+Tệp bị bỏ qua: 0
+
+Quá trình hoàn tất.
+\n`);
+    
+    // Show the password hint when user discovers encrypted files
+    document.getElementById('password-hint').style.display = 'block';
+    gameProgress = Math.max(gameProgress, 1);
+  } else {
+    appendToCmdContent(`
+CIPHER [/E | /D | /C | /G | /S:dir] [/A] [/I] [/F] [/Q] [pathname [...]]
+
+  /E        Mã hóa các thư mục được chỉ định.
+  /D        Giải mã các thư mục được chỉ định.
+  /C        Hiển thị thông tin về thư mục được mã hóa.
+  /G        Tạo một khóa mã hóa EFS mới.
+  /S:dir    Thực hiện thao tác với các thư mục con
+  /A        Hoạt động trên các tệp cũng như thư mục
+  pathname  Đặc tả tệp hoặc thư mục
+
+Ví dụ:
+  cipher /e /s:c:\\secure
+  cipher /c /s:c:\\secure
+\n`);
+  }
+}
+
+function resetGame() {
+  document.getElementById('win-notification').style.display = 'none';
+  document.getElementById('password-hint').style.display = 'none';
+  gameProgress = 0;
+  passwordFound = false;
+  clearScreen();
+}
+
+// Initialize the game when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Set up the date/time
+  updateDateTime();
+  setInterval(updateDateTime, 60000);
+  
+  // Make sure cmd-input event handler is properly set
+  const cmdInput = document.getElementById('cmd-input');
+  if (cmdInput) {
+    cmdInput.addEventListener('keydown', function(event) {
+      handleCommand(event);
+    });
+  }
+  
+  // Hide notification elements initially
+  if (document.getElementById('win-notification')) {
+    document.getElementById('win-notification').style.display = 'none';
+  }
+  if (document.getElementById('password-hint')) {
+    document.getElementById('password-hint').style.display = 'none';
+  }
+  
+  // Khởi động mặc định với lệnh help
+  setTimeout(() => {
+    openWindow('cmd-window');
+    appendToCmdContent(`help\n`);
+    showHelp();
+    appendToCmdContent(`${currentPath}>`);
+  }, 1000);
+});
+  </script>
+</body>
+</html>

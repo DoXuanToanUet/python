@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>CMD Simulator Game</title>
+  <style>
+    /* Giao diện Terminal */
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 16px;
+    }
+    .terminal {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      box-sizing: border-box;
+      min-height: 100vh;
+    }
+    .output {
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+    }
+    .input-line {
+      display: flex;
+      align-items: center;
+    }
+    .prompt {
+      margin-right: 5px;
+    }
+    input.cmd-input {
+      background: transparent;
+      border: none;
+      color: #0f0;
+      flex: 1;
+      font-family: inherit;
+      font-size: inherit;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <div class="output" id="output"></div>
+    <div class="input-line">
+      <span class="prompt">C:\></span>
+      <input type="text" class="cmd-input" id="cmdInput" autofocus autocomplete="off">
+    </div>
+  </div>
+
+  <script>
+    // Danh sách lệnh mẫu và phản hồi
+    const commands = {
+      help: 'Các lệnh hỗ trợ:\nhelp - Hiển thị danh sách lệnh\ncls - Xóa màn hình\ndir - Liệt kê thư mục\necho [text] - In ra văn bản',
+      cls: '',
+      dir: 'Danh sách tập tin:\n- file1.txt\n- file2.doc\n- folder1\n- folder2'
+    };
+
+    const outputDiv = document.getElementById('output');
+    const cmdInput = document.getElementById('cmdInput');
+
+    // Hàm hiển thị nội dung ra màn hình terminal
+    function appendOutput(text) {
+      outputDiv.innerText += text + '\n';
+      // Cuộn xuống cuối trang
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    // Hàm xử lý lệnh nhập vào
+    function processCommand(input) {
+      let args = input.split(' ');
+      let cmd = args[0].toLowerCase();
+      let rest = args.slice(1).join(' ');
+      
+      switch(cmd) {
+        case 'help':
+          appendOutput(commands.help);
+          break;
+        case 'cls':
+          outputDiv.innerText = '';
+          break;
+        case 'dir':
+          appendOutput(commands.dir);
+          break;
+        case 'echo':
+          appendOutput(rest);
+          break;
+        default:
+          appendOutput('Lệnh không xác định: ' + input);
+      }
+    }
+
+    // Lắng nghe sự kiện khi người dùng nhấn phím Enter
+    cmdInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const inputText = cmdInput.value;
+        appendOutput('C:\\>' + inputText);
+        processCommand(inputText);
+        cmdInput.value = '';
+      }
+    });
+
+    // Thông báo chào mừng ban đầu
+    appendOutput('Chào mừng bạn đến với CMD Simulator Game!\nGõ "help" để xem danh sách lệnh.');
+  </script>
+</body>
+</html>

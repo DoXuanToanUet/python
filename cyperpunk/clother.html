@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trò Chơi Chọn Quần Áo Cho Học Sinh</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #4169e1;
+            margin-bottom: 20px;
+        }
+        
+        .game-container {
+            display: flex;
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .character-section {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+            height: 500px;
+            background-color: #e6f7ff;
+        }
+        
+        .wardrobe-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+            height: 500px;
+        }
+        
+        .character {
+            width: 200px;
+            height: 400px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .character-base {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('/api/placeholder/200/400');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 1;
+        }
+        
+        .clothing-item {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 2;
+        }
+        
+        .category {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .category h3 {
+            color: #4169e1;
+            margin-bottom: 10px;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .item {
+            background-color: #e6f7ff;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .item:hover {
+            transform: scale(1.05);
+            background-color: #b3e0ff;
+        }
+        
+        .item img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+        
+        .item p {
+            margin: 5px 0 0;
+            font-size: 12px;
+        }
+        
+        button.reset-btn {
+            background-color: #4169e1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button.reset-btn:hover {
+            background-color: #1e3a8a;
+        }
+
+        .save-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            margin-left: 10px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .save-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Style for uniform types */
+        .uniform-type {
+            margin-bottom: 15px;
+        }
+
+        .type-select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            margin-bottom: 15px;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Trò Chơi Chọn Quần Áo Cho Học Sinh</h1>
+    
+    <div class="uniform-type">
+        <label for="uniform-select">Chọn loại đồng phục:</label>
+        <select id="uniform-select" class="type-select">
+            <option value="daily">Đồng phục hàng ngày</option>
+            <option value="sport">Đồng phục thể thao</option>
+            <option value="ceremony">Đồng phục lễ hội</option>
+        </select>
+    </div>
+    
+    <div class="game-container">
+        <div class="character-section">
+            <h2>Học sinh</h2>
+            <div class="character">
+                <div class="character-base"></div>
+                <div class="clothing-item" id="top"></div>
+                <div class="clothing-item" id="bottom"></div>
+                <div class="clothing-item" id="shoes"></div>
+                <div class="clothing-item" id="accessory"></div>
+            </div>
+            <button class="reset-btn" id="reset-button">Làm mới</button>
+            <button class="save-btn" id="save-button">Lưu bộ đồ</button>
+        </div>
+        
+        <div class="wardrobe-section">
+            <h2>Tủ quần áo</h2>
+            
+            <div class="category" id="tops-category">
+                <h3>Áo</h3>
+                <div class="items-grid" id="tops-grid">
+                    <!-- Tops will be generated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="category" id="bottoms-category">
+                <h3>Quần/Váy</h3>
+                <div class="items-grid" id="bottoms-grid">
+                    <!-- Bottoms will be generated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="category" id="shoes-category">
+                <h3>Giày</h3>
+                <div class="items-grid" id="shoes-grid">
+                    <!-- Shoes will be generated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="category" id="accessories-category">
+                <h3>Phụ kiện</h3>
+                <div class="items-grid" id="accessories-grid">
+                    <!-- Accessories will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Clothing items data
+        const clothingData = {
+            daily: {
+                tops: [
+                    { id: 'top1', name: 'Áo sơ mi trắng', image: 'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQVhJZ6SVefN-0Ro-GPiZb3pQISE8Sl_btpJml7ylVDZTC6yutAWlMADuMeQx9daYm1_YQI0kVrkz10qYO-xawmsGaJkF7fivHqkRy6RX3seuRPb1Q&usqp=CAc', color: '#ffffff' },
+                    { id: 'top2', name: 'Áo sơ mi xanh', image: '/api/placeholder/60/60', color: '#b3e0ff' },
+                    { id: 'top3', name: 'Áo polo', image: '/api/placeholder/60/60', color: '#d9d9d9' }
+                ],
+                bottoms: [
+                    { id: 'bottom1', name: 'Quần tây đen', image: '/api/placeholder/60/60', color: '#333333' },
+                    { id: 'bottom2', name: 'Quần tây xanh đậm', image: '/api/placeholder/60/60', color: '#003366' },
+                    { id: 'bottom3', name: 'Váy xếp ly', image: '/api/placeholder/60/60', color: '#8c8c8c' }
+                ],
+                shoes: [
+                    { id: 'shoes1', name: 'Giày đen', image: '/api/placeholder/60/60', color: '#000000' },
+                    { id: 'shoes2', name: 'Giày trắng', image: '/api/placeholder/60/60', color: '#ffffff' },
+                    { id: 'shoes3', name: 'Giày thể thao', image: '/api/placeholder/60/60', color: '#f2f2f2' }
+                ],
+                accessories: [
+                    { id: 'acc1', name: 'Cà vạt', image: '/api/placeholder/60/60', color: '#cc0000' },
+                    { id: 'acc2', name: 'Nơ', image: '/api/placeholder/60/60', color: '#ff6666' },
+                    { id: 'acc3', name: 'Phù hiệu', image: '/api/placeholder/60/60', color: '#ffcc00' }
+                ]
+            },
+            sport: {
+                tops: [
+                    { id: 'sport_top1', name: 'Áo thun thể thao', image: '/api/placeholder/60/60', color: '#ff9900' },
+                    { id: 'sport_top2', name: 'Áo polo thể thao', image: '/api/placeholder/60/60', color: '#66cc66' },
+                    { id: 'sport_top3', name: 'Áo khoác gió', image: '/api/placeholder/60/60', color: '#3399ff' }
+                ],
+                bottoms: [
+                    { id: 'sport_bottom1', name: 'Quần thể thao dài', image: '/api/placeholder/60/60', color: '#000066' },
+                    { id: 'sport_bottom2', name: 'Quần thể thao ngắn', image: '/api/placeholder/60/60', color: '#003366' },
+                    { id: 'sport_bottom3', name: 'Quần legging', image: '/api/placeholder/60/60', color: '#000000' }
+                ],
+                shoes: [
+                    { id: 'sport_shoes1', name: 'Giày chạy bộ', image: '/api/placeholder/60/60', color: '#ff3300' },
+                    { id: 'sport_shoes2', name: 'Giày bóng rổ', image: '/api/placeholder/60/60', color: '#ffffff' },
+                    { id: 'sport_shoes3', name: 'Giày đá bóng', image: '/api/placeholder/60/60', color: '#33cc33' }
+                ],
+                accessories: [
+                    { id: 'sport_acc1', name: 'Băng đô thể thao', image: '/api/placeholder/60/60', color: '#ff6600' },
+                    { id: 'sport_acc2', name: 'Túi thể thao', image: '/api/placeholder/60/60', color: '#0066cc' },
+                    { id: 'sport_acc3', name: 'Bình nước', image: '/api/placeholder/60/60', color: '#00ccff' }
+                ]
+            },
+            ceremony: {
+                tops: [
+                    { id: 'ceremony_top1', name: 'Áo sơ mi trắng lễ hội', image: '/api/placeholder/60/60', color: '#ffffff' },
+                    { id: 'ceremony_top2', name: 'Áo vest', image: '/api/placeholder/60/60', color: '#000033' },
+                    { id: 'ceremony_top3', name: 'Áo dài truyền thống', image: '/api/placeholder/60/60', color: '#cc0000' }
+                ],
+                bottoms: [
+                    { id: 'ceremony_bottom1', name: 'Quần tây lễ hội', image: '/api/placeholder/60/60', color: '#000000' },
+                    { id: 'ceremony_bottom2', name: 'Váy dài', image: '/api/placeholder/60/60', color: '#000033' },
+                    { id: 'ceremony_bottom3', name: 'Quần áo dài', image: '/api/placeholder/60/60', color: '#ffffff' }
+                ],
+                shoes: [
+                    { id: 'ceremony_shoes1', name: 'Giày tây', image: '/api/placeholder/60/60', color: '#000000' },
+                    { id: 'ceremony_shoes2', name: 'Giày cao gót', image: '/api/placeholder/60/60', color: '#000000' },
+                    { id: 'ceremony_shoes3', name: 'Giày lễ hội', image: '/api/placeholder/60/60', color: '#663300' }
+                ],
+                accessories: [
+                    { id: 'ceremony_acc1', name: 'Cà vạt lễ hội', image: '/api/placeholder/60/60', color: '#000066' },
+                    { id: 'ceremony_acc2', name: 'Huy chương', image: '/api/placeholder/60/60', color: '#ffcc00' },
+                    { id: 'ceremony_acc3', name: 'Găng tay', image: '/api/placeholder/60/60', color: '#ffffff' }
+                ]
+            }
+        };
+        
+        // Current selections
+        let currentOutfit = {
+            top: null,
+            bottom: null,
+            shoes: null,
+            accessory: null
+        };
+        
+        // Saved outfits
+        let savedOutfits = [];
+        
+        // Function to populate clothing items
+        function populateClothingItems(uniformType) {
+            // Clear existing items
+            document.getElementById('tops-grid').innerHTML = '';
+            document.getElementById('bottoms-grid').innerHTML = '';
+            document.getElementById('shoes-grid').innerHTML = '';
+            document.getElementById('accessories-grid').innerHTML = '';
+            
+            // Populate tops
+            clothingData[uniformType].tops.forEach(item => {
+                const itemElement = createItemElement(item, 'top');
+                document.getElementById('tops-grid').appendChild(itemElement);
+            });
+            
+            // Populate bottoms
+            clothingData[uniformType].bottoms.forEach(item => {
+                const itemElement = createItemElement(item, 'bottom');
+                document.getElementById('bottoms-grid').appendChild(itemElement);
+            });
+            
+            // Populate shoes
+            clothingData[uniformType].shoes.forEach(item => {
+                const itemElement = createItemElement(item, 'shoes');
+                document.getElementById('shoes-grid').appendChild(itemElement);
+            });
+            
+            // Populate accessories
+            clothingData[uniformType].accessories.forEach(item => {
+                const itemElement = createItemElement(item, 'accessory');
+                document.getElementById('accessories-grid').appendChild(itemElement);
+            });
+        }
+        
+        // Function to create clothing item element
+        function createItemElement(item, type) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
+            itemDiv.innerHTML = `
+                <div style="background-color: ${item.color}; width: 60px; height: 60px; margin: 0 auto;"></div>
+                <p>${item.name}</p>
+            `;
+            
+            // Add click event to select the item
+            itemDiv.addEventListener('click', function() {
+                selectItem(item, type);
+            });
+            
+            return itemDiv;
+        }
+        
+        // Function to select an item
+        function selectItem(item, type) {
+            currentOutfit[type] = item;
+            
+            // Update the display
+            const element = document.getElementById(type);
+            element.style.backgroundColor = item.color;
+        }
+        
+        // Function to reset the outfit
+        function resetOutfit() {
+            currentOutfit = {
+                top: null,
+                bottom: null,
+                shoes: null,
+                accessory: null
+            };
+            
+            // Clear all clothing displays
+            document.getElementById('top').style.backgroundColor = 'transparent';
+            document.getElementById('bottom').style.backgroundColor = 'transparent';
+            document.getElementById('shoes').style.backgroundColor = 'transparent';
+            document.getElementById('accessory').style.backgroundColor = 'transparent';
+        }
+        
+        // Function to save the current outfit
+        function saveOutfit() {
+            // Clone the current outfit
+            const outfitToSave = JSON.parse(JSON.stringify(currentOutfit));
+            
+            // Only save if at least one item is selected
+            if (outfitToSave.top || outfitToSave.bottom || outfitToSave.shoes || outfitToSave.accessory) {
+                savedOutfits.push(outfitToSave);
+                alert('Đã lưu bộ trang phục!');
+            } else {
+                alert('Vui lòng chọn ít nhất một món đồ trước khi lưu!');
+            }
+        }
+        
+        // Initialize the game
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate initial clothing items for daily uniform
+            populateClothingItems('daily');
+            
+            // Set up reset button
+            document.getElementById('reset-button').addEventListener('click', resetOutfit);
+            
+            // Set up save button
+            document.getElementById('save-button').addEventListener('click', saveOutfit);
+            
+            // Set up uniform type selection
+            document.getElementById('uniform-select').addEventListener('change', function() {
+                const uniformType = this.value;
+                populateClothingItems(uniformType);
+                resetOutfit();
+            });
+        });
+    </script>
+</body>
+</html>

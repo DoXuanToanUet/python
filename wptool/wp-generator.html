@@ -1,762 +1,828 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WP Query Generator</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f5f5f5;
-    }
-    #wp_query_generator {
-      background: #fff;
-      border: 1px solid #ddd;
       padding: 20px;
-      max-width: 1000px;
-      margin: 0 auto;
     }
-    h1 {
-      text-align: center;
-    }
-    /* Tabs Navigation */
-    .wp-query-tabs__nav {
-      display: flex;
-      flex-wrap: wrap;
-      border-bottom: 2px solid #ddd;
-      margin-bottom: 10px;
-    }
-    .wp-query-tabs__nav-item {
-      padding: 10px 15px;
-      cursor: pointer;
-      border: 1px solid transparent;
-      border-bottom: none;
-      margin-right: 5px;
-      background: #eaeaea;
-    }
-    .wp-query-tabs__nav-item.active {
-      background: #fff;
-      border-color: #ddd;
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-      font-weight: bold;
-    }
-    /* Tabs Content */
-    .wp-query-tabs__content {
-      display: none;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-top: none;
-      margin-bottom: 20px;
-    }
-    .wp-query-tabs__content.active {
-      display: block;
-    }
-    .wp-query-tabs__content h4 {
-      margin-top: 0;
-    }
-    .wp-query-tabs__content-row {
-      margin-bottom: 15px;
-    }
-    .wp-query-control {
-      margin-bottom: 10px;
-    }
-    .wp-query-control label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    .wp-query-control input[type="text"],
-    .wp-query-control select {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-    .wp-query-control__desc {
-      font-size: 0.9em;
-      color: #666;
-    }
-    /* Repeater for Tax Query */
-    .wp-query-repeater {
-      border: 1px solid #ccc;
-      padding: 10px;
-      background: #fafafa;
-    }
-    .wp-query-repeater__row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: flex-end;
-      margin-bottom: 10px;
-      border-bottom: 1px dashed #ccc;
-      padding-bottom: 10px;
-    }
-    .wp-query-repeater__row:last-child {
-      border-bottom: none;
-    }
-    .wp-query-repeater__row-item {
-      flex: 1;
-      min-width: 150px;
-    }
-    .wp-query-repeater__remove {
-      background: #e74c3c;
-      color: #fff;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-      border-radius: 3px;
-    }
-    .wp-query-repeater button.add-item {
-      background: #3498db;
-      color: #fff;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 3px;
-      margin-top: 10px;
-    }
-    /* Result Box */
+    /* Box cho kết quả Generated Query */
     .wp-query-result {
-      border: 1px solid #ddd;
-      padding: 15px;
-      background: #f9f9f9;
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      overflow: hidden;
+      margin-top: 30px;
     }
     .wp-query-result__header {
+      background: #f8f9fa;
+      padding: 10px 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+    }
+    .wp-query-result__title {
+      font-weight: 600;
+      font-size: 1.2rem;
     }
     .wp-query-switcher {
       display: flex;
-      gap: 5px;
     }
     .wp-query-switcher__item {
       padding: 5px 10px;
-      border: 1px solid #ccc;
       cursor: pointer;
+      border: 1px solid transparent;
     }
-    .wp-query-switcher__item.active {
-      background: #3498db;
+    .wp-query-switcher__item.wp-query-switcher-active {
+      background: #9D64ED;
       color: #fff;
+      border-color: #9D64ED;
+    }
+    .wp-query-result__content {
+      padding: 15px;
+      background: #fff;
+      white-space: pre;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    .d-none {
+      display: none !important;
     }
     .wp-query-result__actions {
-      margin-top: 10px;
+      padding: 10px 15px;
+      background: #f8f9fa;
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
-    .wp-query-result__actions button {
-      padding: 8px 12px;
-      border: none;
-      background: #2ecc71;
-      color: #fff;
-      cursor: pointer;
-      border-radius: 3px;
+    /* Layout 3 phần: tab title (2 cột), tab desc (7 cột), banner (3 cột) */
+    .tab-header-layout {
+      margin-bottom: 30px;
     }
-    #generate_button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      background: #27ae60;
-      color: #fff;
-      border: none;
-      font-size: 1.1em;
+    .tab-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .tab-desc {
+      font-size: 1rem;
+      color: #555;
+    }
+    /* Banner custom */
+    .bg-banner-jetengine {
+      background: #9D64ED;
+    }
+    .box-260 {
+      height: 260px;
+    }
+    .box-center {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .mt-32 { margin-top: 32px; }
+    .pt-28 { padding-top: 28px; }
+    .pb-40 { padding-bottom: 40px; }
+    .px-8 { padding-left: 8px; padding-right: 8px; }
+    .context-dark { color: #fff; }
+    /* Repeater: Tax Query, Meta Query, Date Query - dàn hàng ngang trên desktop, dọc trên mobile */
+    .tax-query-item > .flex-container,
+    .meta-query-item > .flex-container,
+    .date-query-item > .flex-container {
+      display: flex;
+      flex-direction: column;
+    }
+    @media (min-width: 992px) {
+      .tax-query-item > .flex-container,
+      .meta-query-item > .flex-container,
+      .date-query-item > .flex-container {
+        flex-direction: row;
+      }
+    }
+    .tax-query-item .flex-container > div,
+    .meta-query-item .flex-container > div,
+    .date-query-item .flex-container > div {
+      flex: 1;
+      margin-right: 10px;
+    }
+    .tax-query-item .flex-container > div:last-child,
+    .meta-query-item .flex-container > div:last-child,
+    .date-query-item .flex-container > div:last-child {
+      margin-right: 0;
+    }
+    /* Nút xóa cho repeater */
+    .remove-item {
+      position: absolute;
+      top: 5px;
+      right: 10px;
       cursor: pointer;
-      border-radius: 3px;
-      margin-top: 20px;
+      font-size: 20px;
+      color: red;
     }
   </style>
 </head>
 <body>
-  <div id="wp_query_generator">
-    <h1>WP Query Generator</h1>
-    <div class="wp-query-tabs">
-      <div class="wp-query-tabs__nav">
-        <div class="wp-query-tabs__nav-item active" data-tab="general">General</div>
-        <div class="wp-query-tabs__nav-item" data-tab="pagination">Pagination</div>
-        <div class="wp-query-tabs__nav-item" data-tab="post_page">Post &amp; Page</div>
-        <div class="wp-query-tabs__nav-item" data-tab="author">Author</div>
-        <div class="wp-query-tabs__nav-item" data-tab="cat_tag">Category &amp; Tag</div>
-        <div class="wp-query-tabs__nav-item" data-tab="tax_query">Tax Query</div>
-        <div class="wp-query-tabs__nav-item" data-tab="meta_query">Meta Query</div>
-        <div class="wp-query-tabs__nav-item" data-tab="date_query">Date Query</div>
-        <div class="wp-query-tabs__nav-item" data-tab="misc">Misc</div>
+  <div class="container">
+    <!-- Layout 3 phần: Tab title, tab desc và Banner -->
+    <div class="row tab-header-layout align-items-center">
+      <div class="col-lg-2 col-12">
+        <h2 class="tab-title">WP Query</h2>
       </div>
-      <!-- Tab Contents -->
-      <div class="wp-query-tabs__content active" id="tab-general">
-        <h4>General Parameters</h4>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="post_type">Post type</label>
-            <input type="text" id="post_type" placeholder='e.g. "post" or "any"'>
-            <div class="wp-query-control__desc">Set post type slug. Use "any" to retrieve any type.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="post_status">Post status</label>
-            <select id="post_status">
-              <option value="">Select...</option>
-              <option value="publish">Publish</option>
-              <option value="pending">Pending</option>
-              <option value="draft">Draft</option>
-              <option value="future">Future</option>
-              <option value="private">Private</option>
-              <option value="trash">Trash</option>
-              <option value="any">Any</option>
-            </select>
-            <div class="wp-query-control__desc">Use post status.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="order">Order</label>
-            <select id="order">
-              <option value="">Select...</option>
-              <option value="ASC">ASC</option>
-              <option value="DESC">DESC</option>
-            </select>
-            <div class="wp-query-control__desc">Designates the ascending or descending order of the "orderby" parameter.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="orderby">Orderby</label>
-            <select id="orderby">
-              <option value="">Select...</option>
-              <option value="none">None</option>
-              <option value="ID">ID</option>
-              <option value="author">Author</option>
-              <option value="title">Title</option>
-              <option value="name">Name</option>
-              <option value="type">Type</option>
-              <option value="date">Date</option>
-              <option value="modified">Modified</option>
-              <option value="rand">Rand</option>
-              <option value="comment_count">Comment count</option>
-              <option value="relevance">Relevance</option>
-              <option value="menu_order">Menu order</option>
-              <option value="meta_value">Meta value</option>
-              <option value="meta_value_num">Meta value num</option>
-            </select>
-            <div class="wp-query-control__desc">Designates the sorting order.</div>
-          </div>
-        </div>
+      <div class="col-lg-7 col-12">
+        <p class="tab-desc">Ultimate tool for creating custom WordPress queries &amp; generating arguments for WP_Query class in JSON format.</p>
       </div>
-      
-      <div class="wp-query-tabs__content" id="tab-pagination">
-        <h4>Pagination Parameters</h4>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="posts_per_page">Posts per page</label>
-            <input type="text" id="posts_per_page" placeholder="e.g. 10">
-            <div class="wp-query-control__desc">Number of posts to show per page.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="offset">Offset</label>
-            <input type="text" id="offset" placeholder="e.g. 0">
-            <div class="wp-query-control__desc">Number of posts to pass over.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="paged">Paged</label>
-            <input type="text" id="paged" placeholder="e.g. 1">
-            <div class="wp-query-control__desc">The page number for pagination.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="page">Page</label>
-            <input type="text" id="page" placeholder="e.g. 1">
-            <div class="wp-query-control__desc">For a static front page.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <input type="checkbox" id="ignore_sticky_posts">
-            <label for="ignore_sticky_posts">Ignore sticky posts</label>
-            <div class="wp-query-control__desc">Ignore post stickiness.</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="wp-query-tabs__content" id="tab-post_page">
-        <h4>Post &amp; Page Parameters</h4>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="p">Post ID</label>
-            <input type="text" id="p" placeholder="e.g. 1">
-            <div class="wp-query-control__desc">Use post ID to get a single post.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="name">Post name</label>
-            <input type="text" id="name" placeholder="e.g. post-slug">
-            <div class="wp-query-control__desc">Use post slug to get a single post.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="title">Post title</label>
-            <input type="text" id="title" placeholder="e.g. My Post">
-            <div class="wp-query-control__desc">Use post title to get a single post.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="page_id">Page ID</label>
-            <input type="text" id="page_id" placeholder="e.g. 2">
-            <div class="wp-query-control__desc">Use page ID to get a single page.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="pagename">Page name</label>
-            <input type="text" id="pagename" placeholder="e.g. page-slug">
-            <div class="wp-query-control__desc">Use slug to get a single page.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="post_parent">Page parent</label>
-            <input type="text" id="post_parent" placeholder="e.g. 0">
-            <div class="wp-query-control__desc">Return only child pages (set 0 for top-level entries).</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="post_parent__in">Page parent in</label>
-            <input type="text" id="post_parent__in" placeholder="e.g. 1,2,3">
-            <div class="wp-query-control__desc">Comma-separated page IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="post_parent__not_in">Page parent not in</label>
-            <input type="text" id="post_parent__not_in" placeholder="e.g. 4,5">
-            <div class="wp-query-control__desc">Comma-separated page IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="post__in">Post in</label>
-            <input type="text" id="post__in" placeholder="e.g. 1,2,3">
-            <div class="wp-query-control__desc">Comma-separated post IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="post__not_in">Post not in</label>
-            <input type="text" id="post__not_in" placeholder="e.g. 4,5">
-            <div class="wp-query-control__desc">Comma-separated post IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="post_name__in">Post name in</label>
-            <input type="text" id="post_name__in" placeholder="e.g. slug1,slug2">
-            <div class="wp-query-control__desc">Comma-separated post slugs.</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="wp-query-tabs__content" id="tab-author">
-        <h4>Author Parameters</h4>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="author">Author</label>
-            <input type="text" id="author" placeholder="e.g. 1 or 1,2">
-            <div class="wp-query-control__desc">Use author ID or comma-separated list of IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="author_name">Author name</label>
-            <input type="text" id="author_name" placeholder="e.g. user_nicename">
-            <div class="wp-query-control__desc">Use "user_nicename" – NOT name.</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="wp-query-tabs__content" id="tab-cat_tag">
-        <h4>Category &amp; Tag Parameters</h4>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="cat">Category</label>
-            <input type="text" id="cat" placeholder="e.g. 1">
-            <div class="wp-query-control__desc">Use category ID.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="category_name">Category name</label>
-            <input type="text" id="category_name" placeholder="e.g. slug">
-            <div class="wp-query-control__desc">Use category slug.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="category__and">Category and</label>
-            <input type="text" id="category__and" placeholder="e.g. 1,2">
-            <div class="wp-query-control__desc">Comma-separated list of category IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="category__in">Category in</label>
-            <input type="text" id="category__in" placeholder="e.g. 1,2">
-            <div class="wp-query-control__desc">Comma-separated list of category IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="category__not_in">Category not in</label>
-            <input type="text" id="category__not_in" placeholder="e.g. 3,4">
-            <div class="wp-query-control__desc">Comma-separated list of category IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="tag">Tag</label>
-            <input type="text" id="tag" placeholder="e.g. tag-slug">
-            <div class="wp-query-control__desc">Use tag slug.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="tag_id">Tag ID</label>
-            <input type="text" id="tag_id" placeholder="e.g. 1">
-            <div class="wp-query-control__desc">Use tag ID.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="tag__and">Tag and</label>
-            <input type="text" id="tag__and" placeholder="e.g. 1,2">
-            <div class="wp-query-control__desc">Comma-separated list of tag IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="tag__in">Tag in</label>
-            <input type="text" id="tag__in" placeholder="e.g. 1,2">
-            <div class="wp-query-control__desc">Comma-separated list of tag IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="tag__not_in">Tag not in</label>
-            <input type="text" id="tag__not_in" placeholder="e.g. 3,4">
-            <div class="wp-query-control__desc">Comma-separated list of tag IDs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="tag_slug__and">Tag slug and</label>
-            <input type="text" id="tag_slug__and" placeholder="e.g. tag1,tag2">
-            <div class="wp-query-control__desc">Comma-separated list of tag slugs.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="tag_slug__in">Tag slug in</label>
-            <input type="text" id="tag_slug__in" placeholder="e.g. tag1,tag2">
-            <div class="wp-query-control__desc">Comma-separated list of tag slugs.</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="wp-query-tabs__content" id="tab-tax_query">
-        <h4>Taxonomy Parameters</h4>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="tax_query_relation">Relation</label>
-            <select id="tax_query_relation">
-              <option value="">Select...</option>
-              <option value="AND">AND</option>
-              <option value="OR">OR</option>
-            </select>
-            <div class="wp-query-control__desc">Logical relationship between each inner taxonomy query.</div>
-          </div>
-        </div>
-        <div class="wp-query-repeater">
-          <label class="wp-query-repeater__label">Tax query</label>
-          <div id="tax_query_container">
-            <!-- Repeater rows sẽ được thêm tại đây -->
-            <div class="wp-query-repeater__row">
-              <div class="wp-query-repeater__row-item">
-                <div class="wp-query-control">
-                  <label>Taxonomy</label>
-                  <input type="text" class="tax-taxonomy" placeholder="e.g. category">
-                </div>
-              </div>
-              <div class="wp-query-repeater__row-item">
-                <div class="wp-query-control">
-                  <label>Field</label>
-                  <select class="tax-field">
-                    <option value="">Select...</option>
-                    <option value="term_id">Term ID</option>
-                    <option value="name">Name</option>
-                    <option value="slug">Slug</option>
-                    <option value="term_taxonomy_id">Term taxonomy ID</option>
-                  </select>
-                </div>
-              </div>
-              <div class="wp-query-repeater__row-item">
-                <div class="wp-query-control">
-                  <label>Taxonomy term(s)</label>
-                  <input type="text" class="tax-terms" placeholder="e.g. 1,2">
-                </div>
-              </div>
-              <div class="wp-query-repeater__row-item">
-                <div class="wp-query-control">
-                  <label>Operator</label>
-                  <select class="tax-operator">
-                    <option value="">Select...</option>
-                    <option value="IN">IN</option>
-                    <option value="NOT IN">NOT IN</option>
-                    <option value="AND">AND</option>
-                    <option value="EXISTS">EXISTS</option>
-                    <option value="NOT EXISTS">NOT EXISTS</option>
-                  </select>
-                </div>
-              </div>
-              <button class="wp-query-repeater__remove">×</button>
-            </div>
-          </div>
-          <button type="button" class="add-item">Add Item</button>
-        </div>
-      </div>
-      
-      <div class="wp-query-tabs__content" id="tab-meta_query">
-        <h4>Meta Query Parameters</h4>
-        <p>Chưa có nội dung. Bạn có thể thêm các trường meta tùy ý.</p>
-      </div>
-      
-      <div class="wp-query-tabs__content" id="tab-date_query">
-        <h4>Date Query Parameters</h4>
-        <p>Chưa có nội dung. Bạn có thể thêm các trường date query tùy ý.</p>
-      </div>
-      
-      <div class="wp-query-tabs__content" id="tab-misc">
-        <h4>Misc Parameters</h4>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="has_password">Has password</label>
-            <select id="has_password">
-              <option value="0">Posts without passwords</option>
-              <option value="1">Posts with passwords</option>
-            </select>
-            <div class="wp-query-control__desc">Get posts with/without password.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="post_password">Post password</label>
-            <input type="text" id="post_password" placeholder="e.g. secret">
-            <div class="wp-query-control__desc">Show posts with a particular password.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="comment_count">Comment count</label>
-            <input type="text" id="comment_count" placeholder="e.g. =5">
-            <div class="wp-query-control__desc">Format: =NUM, where possible operators: =, !=, &gt;, &gt;=, &lt;, &lt;=</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="perm">User permission</label>
-            <input type="text" id="perm" placeholder="e.g. edit_posts">
-            <div class="wp-query-control__desc">Show posts if user has the appropriate capability.</div>
-          </div>
-        </div>
-        <div class="wp-query-tabs__content-row">
-          <div class="wp-query-control">
-            <label for="post_mime_type">Post mime type</label>
-            <input type="text" id="post_mime_type" placeholder="e.g. image/jpeg">
-            <div class="wp-query-control__desc">Allowed mime types.</div>
-          </div>
+      <div class="col-lg-3 col-12">
+        <div class="d-none d-lg-block box-260 box-center rounded text-center mt-32 pt-28 px-8 pb-40 bg-banner-jetengine context-dark">
+          <svg class="mb-44" width="147" height="46" viewBox="0 0 147 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M47.6337 26.1201C53.4492 26.1201 58.1685 21.3932 58.1685 15.5601V7.64169C58.1685 6.18004 56.992 5 55.5348 5C54.0776 5 52.9011 6.18004 52.9011 7.64169V15.5601C52.9011 18.4766 50.5415 20.8434 47.6337 20.8434C46.1765 20.8434 45 22.0235 45 23.4784C45 24.9334 46.1765 26.1201 47.6337 26.1201Z" fill="white"></path>
+            <path d="M91.8318 20.8434C88.924 20.8434 86.5644 18.4766 86.5644 15.5601V15.3053H88.6566C90.1138 15.3053 91.297 14.1185 91.297 12.6569C91.297 11.1952 90.1138 10.0085 88.6566 10.0085H86.5644V7.64169C86.5644 6.18675 85.3879 5 83.9307 5C82.4734 5 81.297 6.18004 81.297 7.64169V15.5601C81.297 21.3932 86.0162 26.1201 91.8318 26.1201C93.289 26.1201 94.4655 24.9401 94.4655 23.4784C94.4655 22.0168 93.289 20.8434 91.8318 20.8434Z" fill="white"></path>
+            <path d="M79.7863 11.8591C79.7863 11.8523 79.7863 11.8523 79.7863 11.8591C79.793 11.8523 79.7997 11.8523 79.7997 11.8523C78.9708 9.66658 77.42 7.74901 75.2542 6.48851C70.2275 3.56522 63.8103 5.29505 60.9159 10.3505C58.0148 15.3992 59.7394 21.8559 64.7595 24.7725C68.4561 26.918 72.9079 26.5426 76.1566 24.1825L76.1366 24.1557C76.8852 23.693 77.3799 22.8616 77.3799 21.9163C77.3799 20.4613 76.2034 19.2813 74.7529 19.2813C74.051 19.2813 73.4093 19.5562 72.9414 20.0121C71.3638 21.0782 69.2649 21.2458 67.4935 20.2669L78.1018 15.3254C78.7168 15.1377 79.2649 14.722 79.6058 14.1186C80.0203 13.4012 80.0604 12.5765 79.7863 11.8591ZM72.6272 11.0545C72.9414 11.2355 73.2221 11.4434 73.4828 11.6713L64.7528 15.7277C64.7328 14.7958 64.96 13.8504 65.4547 12.9855C66.9052 10.4645 70.1138 9.59954 72.6272 11.0545Z" fill="white"></path>
+            <path d="M101.301 0.28017C102.483 0.213812 103.157 1.61285 102.372 2.50218L95.3806 10.4182C94.5619 11.3452 93.0361 10.7526 93.0522 9.51382L93.0937 6.30198C93.0992 5.88117 92.907 5.48233 92.5749 5.22546L90.0403 3.26498C89.0627 2.50883 89.5467 0.940009 90.7788 0.870839L101.301 0.28017Z" fill="#9D64ED"></path>
+          </svg>
+          <h5>Manage queries<br> via one-stop interface with</h5>
+          <h3 class="mb-40">Query Builder</h3>
+          <a href="https://crocoblock.com/plugins/jetengine/query-builder/" class="btn btn-custom btn-sm btn-effect-1">
+            <span class="btn-text">Learn more</span>
+            <svg class="btn-icon" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13.3333 8L11.4533 9.88L17.56 16L11.4533 22.12L13.3333 24L21.3333 16L13.3333 8Z" fill="white"></path>
+            </svg>
+          </a>
         </div>
       </div>
     </div>
-    
-    <!-- Kết quả Generated Query -->
+    <!-- END Layout 3 phần -->
+
+    <!-- Nav tabs cho các tham số truy vấn -->
+    <ul class="nav nav-tabs" id="queryTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">General</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pagination-tab" data-bs-toggle="tab" data-bs-target="#pagination" type="button" role="tab">Pagination</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="postpage-tab" data-bs-toggle="tab" data-bs-target="#postpage" type="button" role="tab">Post &amp; Page</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="author-tab" data-bs-toggle="tab" data-bs-target="#author" type="button" role="tab">Author</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="cat-tag-tab" data-bs-toggle="tab" data-bs-target="#cat-tag" type="button" role="tab">Category &amp; Tag</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="taxquery-tab" data-bs-toggle="tab" data-bs-target="#taxquery" type="button" role="tab">Tax Query</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="metaquery-tab" data-bs-toggle="tab" data-bs-target="#metaquery" type="button" role="tab">Meta Query</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="datequery-tab" data-bs-toggle="tab" data-bs-target="#datequery" type="button" role="tab">Date Query</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="misc-tab" data-bs-toggle="tab" data-bs-target="#misc" type="button" role="tab">Misc</button>
+      </li>
+    </ul>
+
+    <!-- Nội dung của các Tab tham số -->
+    <div class="tab-content" id="queryTabsContent">
+      <!-- General -->
+      <div class="tab-pane fade show active" id="general" role="tabpanel">
+        <div class="mb-3">
+          <label for="post_type" class="form-label">Post type</label>
+          <input type="text" class="form-control field" id="post_type" placeholder='e.g. "post" or "any"'>
+          <div class="form-text">Set post type slug. Use "any" to retrieve any type</div>
+        </div>
+        <div class="mb-3">
+          <label for="post_status" class="form-label">Post status</label>
+          <select class="form-select field" id="post_status">
+            <option value="">Select...</option>
+            <option value="publish">Publish</option>
+            <option value="pending">Pending</option>
+            <option value="draft">Draft</option>
+            <option value="future">Future</option>
+            <option value="private">Private</option>
+            <option value="trash">Trash</option>
+            <option value="any">Any</option>
+          </select>
+          <div class="form-text">Use post status</div>
+        </div>
+        <div class="mb-3">
+          <label for="order" class="form-label">Order</label>
+          <select class="form-select field" id="order">
+            <option value="">Select...</option>
+            <option value="ASC">ASC</option>
+            <option value="DESC">DESC</option>
+          </select>
+          <div class="form-text">Designates the ascending or descending order</div>
+        </div>
+        <div class="mb-3">
+          <label for="orderby" class="form-label">Orderby</label>
+          <select class="form-select field" id="orderby">
+            <option value="">Select...</option>
+            <option value="none">None</option>
+            <option value="ID">ID</option>
+            <option value="author">Author</option>
+            <option value="title">Title</option>
+            <option value="name">Name</option>
+            <option value="type">Type</option>
+            <option value="date">Date</option>
+            <option value="modified">Modified</option>
+            <option value="rand">Rand</option>
+            <option value="comment_count">Comment count</option>
+            <option value="relevance">Relevance</option>
+            <option value="menu_order">Menu order</option>
+            <option value="meta_value">Meta value</option>
+            <option value="meta_value_num">Meta value num</option>
+          </select>
+          <div class="form-text">Designates orderby parameter</div>
+        </div>
+      </div>
+      <!-- Pagination -->
+      <div class="tab-pane fade" id="pagination" role="tabpanel">
+        <div class="mb-3">
+          <label for="posts_per_page" class="form-label">Posts per page</label>
+          <input type="text" class="form-control field" id="posts_per_page" placeholder="Number of posts per page">
+          <div class="form-text">Number of posts to show per page</div>
+        </div>
+        <div class="mb-3">
+          <label for="offset" class="form-label">Offset</label>
+          <input type="text" class="form-control field" id="offset" placeholder="Number of posts to skip">
+          <div class="form-text">Number of posts to pass over</div>
+        </div>
+        <div class="mb-3">
+          <label for="paged" class="form-label">Paged</label>
+          <input type="text" class="form-control field" id="paged" placeholder="Page number">
+          <div class="form-text">Page number for "Older Entries" link</div>
+        </div>
+        <div class="mb-3">
+          <label for="page" class="form-label">Page</label>
+          <input type="text" class="form-control field" id="page" placeholder="Static front page number">
+          <div class="form-text">Page for a static front page</div>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input field" type="checkbox" value="true" id="ignore_sticky_posts">
+          <label class="form-check-label" for="ignore_sticky_posts">Ignore sticky posts</label>
+          <div class="form-text">Ignore post stickiness</div>
+        </div>
+      </div>
+      <!-- Post & Page -->
+      <div class="tab-pane fade" id="postpage" role="tabpanel">
+        <div class="mb-3">
+          <label for="p" class="form-label">Post ID</label>
+          <input type="text" class="form-control field" id="p" placeholder="Post ID">
+          <div class="form-text">Use post ID to get single post</div>
+        </div>
+        <div class="mb-3">
+          <label for="name" class="form-label">Post name</label>
+          <input type="text" class="form-control field" id="name" placeholder="Post slug">
+          <div class="form-text">Use post slug to get single post</div>
+        </div>
+        <div class="mb-3">
+          <label for="title" class="form-label">Post title</label>
+          <input type="text" class="form-control field" id="title" placeholder="Post title">
+          <div class="form-text">Use post title to get single post</div>
+        </div>
+        <div class="mb-3">
+          <label for="page_id" class="form-label">Page ID</label>
+          <input type="text" class="form-control field" id="page_id" placeholder="Page ID">
+          <div class="form-text">Use page ID to get single page</div>
+        </div>
+        <div class="mb-3">
+          <label for="pagename" class="form-label">Page name</label>
+          <input type="text" class="form-control field" id="pagename" placeholder="Page slug">
+          <div class="form-text">Use slug to get single page</div>
+        </div>
+        <div class="mb-3">
+          <label for="post_parent" class="form-label">Page parent</label>
+          <input type="text" class="form-control field" id="post_parent" placeholder="Parent page ID">
+          <div class="form-text">Use page ID to return only child pages (set 0 cho top-level)</div>
+        </div>
+        <div class="mb-3">
+          <label for="post_parent__in" class="form-label">Page parent in</label>
+          <input type="text" class="form-control field" id="post_parent__in" placeholder="Comma-separated page IDs">
+          <div class="form-text">Specify page whose parent is in a list</div>
+        </div>
+        <div class="mb-3">
+          <label for="post_parent__not_in" class="form-label">Page parent not in</label>
+          <input type="text" class="form-control field" id="post_parent__not_in" placeholder="Comma-separated page IDs">
+          <div class="form-text">Specify page whose parent is not in a list</div>
+        </div>
+        <div class="mb-3">
+          <label for="post__in" class="form-label">Post in</label>
+          <input type="text" class="form-control field" id="post__in" placeholder="Comma-separated post IDs">
+          <div class="form-text">Specify posts to retrieve</div>
+        </div>
+        <div class="mb-3">
+          <label for="post__not_in" class="form-label">Post not in</label>
+          <input type="text" class="form-control field" id="post__not_in" placeholder="Comma-separated post IDs">
+          <div class="form-text">Specify posts not to retrieve</div>
+        </div>
+        <div class="mb-3">
+          <label for="post_name__in" class="form-label">Post name in</label>
+          <input type="text" class="form-control field" id="post_name__in" placeholder="Comma-separated post slugs">
+          <div class="form-text">Specify posts to retrieve</div>
+        </div>
+      </div>
+      <!-- Author -->
+      <div class="tab-pane fade" id="author" role="tabpanel">
+        <div class="mb-3">
+          <label for="author" class="form-label">Author</label>
+          <input type="text" class="form-control field" id="author" placeholder="Author ID(s), comma separated">
+          <div class="form-text">Use author id or comma-separated list of IDs</div>
+        </div>
+        <div class="mb-3">
+          <label for="author_name" class="form-label">Author name</label>
+          <input type="text" class="form-control field" id="author_name" placeholder="Author user_nicename">
+          <div class="form-text">Use "user_nicename" - NOT name</div>
+        </div>
+      </div>
+      <!-- Category & Tag -->
+      <div class="tab-pane fade" id="cat-tag" role="tabpanel">
+        <div class="mb-3">
+          <label for="cat" class="form-label">Category</label>
+          <input type="text" class="form-control field" id="cat" placeholder="Category ID">
+          <div class="form-text">Use category ID</div>
+        </div>
+        <div class="mb-3">
+          <label for="category_name" class="form-label">Category name</label>
+          <input type="text" class="form-control field" id="category_name" placeholder="Category slug">
+          <div class="form-text">Use category slug</div>
+        </div>
+        <div class="mb-3">
+          <label for="category__and" class="form-label">Category and</label>
+          <input type="text" class="form-control field" id="category__and" placeholder="Comma-separated category IDs">
+          <div class="form-text">Comma-separated list of category IDs</div>
+        </div>
+        <div class="mb-3">
+          <label for="category__in" class="form-label">Category in</label>
+          <input type="text" class="form-control field" id="category__in" placeholder="Comma-separated category IDs">
+          <div class="form-text">Comma-separated list of category IDs</div>
+        </div>
+        <div class="mb-3">
+          <label for="category__not_in" class="form-label">Category not in</label>
+          <input type="text" class="form-control field" id="category__not_in" placeholder="Comma-separated category IDs">
+          <div class="form-text">Comma-separated list of category IDs</div>
+        </div>
+        <div class="mb-3">
+          <label for="tag" class="form-label">Tag</label>
+          <input type="text" class="form-control field" id="tag" placeholder="Tag slug">
+          <div class="form-text">Use tag slug</div>
+        </div>
+        <div class="mb-3">
+          <label for="tag_id" class="form-label">Tag ID</label>
+          <input type="text" class="form-control field" id="tag_id" placeholder="Tag ID">
+          <div class="form-text">Use tag ID</div>
+        </div>
+        <div class="mb-3">
+          <label for="tag__and" class="form-label">Tag and</label>
+          <input type="text" class="form-control field" id="tag__and" placeholder="Comma-separated tag IDs">
+          <div class="form-text">Comma-separated list of tag IDs</div>
+        </div>
+        <div class="mb-3">
+          <label for="tag__in" class="form-label">Tag in</label>
+          <input type="text" class="form-control field" id="tag__in" placeholder="Comma-separated tag IDs">
+          <div class="form-text">Comma-separated list of tag IDs</div>
+        </div>
+        <div class="mb-3">
+          <label for="tag__not_in" class="form-label">Tag not in</label>
+          <input type="text" class="form-control field" id="tag__not_in" placeholder="Comma-separated tag IDs">
+          <div class="form-text">Comma-separated list of tag IDs</div>
+        </div>
+        <div class="mb-3">
+          <label for="tag_slug__and" class="form-label">Tag slug and</label>
+          <input type="text" class="form-control field" id="tag_slug__and" placeholder="Comma-separated tag slugs">
+          <div class="form-text">Comma-separated list of tag slugs</div>
+        </div>
+        <div class="mb-3">
+          <label for="tag_slug__in" class="form-label">Tag slug in</label>
+          <input type="text" class="form-control field" id="tag_slug__in" placeholder="Comma-separated tag slugs">
+          <div class="form-text">Comma-separated list of tag slugs</div>
+        </div>
+      </div>
+      <!-- Tax Query -->
+      <div class="tab-pane fade" id="taxquery" role="tabpanel">
+        <div class="mb-3">
+          <label for="tax_query_relation" class="form-label">Relation</label>
+          <select class="form-select field" id="tax_query_relation">
+            <option value="">Select...</option>
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+          </select>
+          <div class="form-text">Logical relationship between taxonomy queries</div>
+        </div>
+        <div id="taxQueryRepeater">
+          <label class="form-label">Tax query</label>
+          <div id="taxQueryList"></div>
+          <button type="button" class="btn btn-sm btn-outline-primary" id="addTaxQuery">Add Item</button>
+        </div>
+      </div>
+      <!-- Meta Query -->
+      <div class="tab-pane fade" id="metaquery" role="tabpanel">
+        <div class="mb-3">
+          <label for="meta_query_relation" class="form-label">Relation</label>
+          <select class="form-select field" id="meta_query_relation">
+            <option value="">Select...</option>
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+          </select>
+          <div class="form-text">Logical relationship between meta queries</div>
+        </div>
+        <div id="metaQueryRepeater">
+          <label class="form-label">Meta query</label>
+          <div id="metaQueryList"></div>
+          <button type="button" class="btn btn-sm btn-outline-primary" id="addMetaQuery">Add Item</button>
+        </div>
+      </div>
+      <!-- Date Query -->
+      <div class="tab-pane fade" id="datequery" role="tabpanel">
+        <div class="mb-3">
+          <label for="date_query_relation" class="form-label">Relation</label>
+          <select class="form-select field" id="date_query_relation">
+            <option value="">Select...</option>
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+          </select>
+          <div class="form-text">Logical relationship between date queries</div>
+        </div>
+        <div id="dateQueryRepeater">
+          <label class="form-label">Date query</label>
+          <div id="dateQueryList"></div>
+          <button type="button" class="btn btn-sm btn-outline-primary" id="addDateQuery">Add Item</button>
+        </div>
+      </div>
+      <!-- Misc -->
+      <div class="tab-pane fade" id="misc" role="tabpanel">
+        <div class="mb-3">
+          <label for="has_password" class="form-label">Has password</label>
+          <select class="form-select field" id="has_password">
+            <option value="">Select...</option>
+            <option value="0">Posts without passwords</option>
+            <option value="1">Posts with passwords</option>
+          </select>
+          <div class="form-text">Get posts with/without password</div>
+        </div>
+        <div class="mb-3">
+          <label for="post_password" class="form-label">Post password</label>
+          <input type="text" class="form-control field" id="post_password" placeholder="Post password">
+          <div class="form-text">Show posts with a particular password</div>
+        </div>
+        <div class="mb-3">
+          <label for="comment_count" class="form-label">Comment count</label>
+          <input type="text" class="form-control field" id="comment_count" placeholder="e.g. =5">
+          <div class="form-text">Format: =NUM (operators: =, !=, >, >=, <, <=)</div>
+        </div>
+        <div class="mb-3">
+          <label for="perm" class="form-label">User permission</label>
+          <input type="text" class="form-control field" id="perm" placeholder="User permission">
+          <div class="form-text">Show posts if user has the appropriate capability</div>
+        </div>
+        <div class="mb-3">
+          <label for="post_mime_type" class="form-label">Post mime type</label>
+          <input type="text" class="form-control field" id="post_mime_type" placeholder="Allowed mime types">
+          <div class="form-text">Allowed mime types</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Generated Query Section với 2 tab: JSON và PHP -->
     <div class="wp-query-result">
-      <div class="wp-query-result__header">
+      <div class="wp-query-result__header d-flex justify-content-between align-items-center">
         <div class="wp-query-result__title">Generated Query</div>
         <div class="wp-query-switcher">
-          <div class="wp-query-switcher__item active" data-type="json">JSON</div>
-          <div class="wp-query-switcher__item" data-type="php">PHP</div>
+          <div class="wp-query-switcher__item wp-query-switcher-active" data-target="result-json">JSON</div>
+          <div class="wp-query-switcher__item" data-target="result-php">PHP</div>
         </div>
       </div>
-      <pre class="wp-query-result__content" id="query_output">{}</pre>
+      <div class="wp-query-result__content" id="result-json"></div>
+      <div class="wp-query-result__content d-none" id="result-php"></div>
       <div class="wp-query-result__actions">
-        <button id="copy_button">Copy to Clipboard</button>
-        <button id="reset_button">Reset Query</button>
+        <button id="copyBtn-json">Copy to Clipboard</button>
+        <button id="resetBtn-json">Reset Query</button>
+        <button id="copyBtn-php" class="d-none">Copy to Clipboard</button>
+        <button id="resetBtn-php" class="d-none">Reset Query</button>
       </div>
     </div>
-    
-    <button id="generate_button">Generate Query</button>
   </div>
 
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Tab Navigation
-    document.querySelectorAll('.wp-query-tabs__nav-item').forEach(item => {
-      item.addEventListener('click', function() {
-        // Xoá active của tất cả các tab
-        document.querySelectorAll('.wp-query-tabs__nav-item').forEach(i => i.classList.remove('active'));
-        document.querySelectorAll('.wp-query-tabs__content').forEach(content => content.classList.remove('active'));
-        // Đánh dấu active cho tab hiện tại
-        this.classList.add('active');
-        const tabId = 'tab-' + this.getAttribute('data-tab');
-        document.getElementById(tabId).classList.add('active');
-      });
-    });
-
-    // Tax Query Repeater: Add item
-    document.querySelector('.add-item').addEventListener('click', function() {
-      const container = document.getElementById('tax_query_container');
-      // Clone dòng mẫu đầu tiên
-      const template = container.firstElementChild.cloneNode(true);
-      // Reset giá trị các input trong template
-      template.querySelectorAll('input').forEach(input => input.value = '');
-      template.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-      container.appendChild(template);
-      attachRemoveEvent(template);
-    });
-
-    // Attach event remove cho các dòng đã có
-    document.querySelectorAll('.wp-query-repeater__remove').forEach(btn => {
-      attachRemoveEvent(btn.parentElement);
-    });
-    function attachRemoveEvent(row) {
-      row.querySelector('.wp-query-repeater__remove').addEventListener('click', function() {
-        if(document.querySelectorAll('#tax_query_container .wp-query-repeater__row').length > 1){
-          row.remove();
+    // Hàm chuyển đổi JS value sang định dạng PHP (đệ quy)
+    function toPHP(value, indentLevel) {
+      const indent = '    '.repeat(indentLevel);
+      if (typeof value === 'string') {
+        return "'" + value.replace(/'/g, "\\'") + "'";
+      } else if (typeof value === 'number') {
+        return value;
+      } else if (typeof value === 'boolean') {
+        return value ? 'true' : 'false';
+      } else if (Array.isArray(value)) {
+        let items = value.map(item => toPHP(item, indentLevel + 1));
+        return "array(" + items.join(", ") + ")";
+      } else if (typeof value === 'object' && value !== null) {
+        let lines = [];
+        for (let k in value) {
+          if (value.hasOwnProperty(k)) {
+            lines.push(indent + "    '" + k + "' => " + toPHP(value[k], indentLevel + 1));
+          }
+        }
+        return "array(\n" + lines.join(",\n") + "\n" + indent + ")";
+      }
+      return "null";
+    }
+    // Hàm tạo nội dung PHP code dựa trên đối tượng query
+    function generatePHP(query) {
+      let phpCode = "$query_args = " + toPHP(query, 0) + ";\n\n";
+      phpCode += "// The Query\n$the_query = new WP_Query( $query_args );\n\n";
+      phpCode += "// The Loop\nif ( $the_query->have_posts() ) {\n\twhile ( $the_query->have_posts() ) {\n\t\t$the_query->the_post();\n\t}\n\t/* Restore original Post Data */\n\twp_reset_postdata();\n} else {\n\t// no posts found\n}\n";
+      return phpCode;
+    }
+    
+    // Hàm tiện ích: chuyển đổi chuỗi CSV thành mảng
+    function parseCSV(value) {
+      return value.split(',').map(v => v.trim()).filter(v => v);
+    }
+    
+    // Hàm cập nhật query dựa trên các trường nhập liệu
+    function updateQuery() {
+      const query = {};
+      // Lấy giá trị từ tất cả các field có class "field"
+      document.querySelectorAll('.field').forEach(field => {
+        const id = field.id;
+        if (field.type === 'checkbox') {
+          query[id] = field.checked;
+        } else {
+          const value = field.value;
+          if (value !== '') {
+            if (['post_parent__in','post_parent__not_in','post__in','post__not_in','post_name__in',
+                 'category__and','category__in','category__not_in','tag__and','tag__in','tag__not_in',
+                 'tag_slug__and','tag_slug__in'].includes(id)) {
+              query[id] = parseCSV(value);
+            } else {
+              query[id] = value;
+            }
+          }
         }
       });
-    }
-
-    // Switcher JSON / PHP (chỉ demo chuyển active, chưa chuyển đổi nội dung)
-    document.querySelectorAll('.wp-query-switcher__item').forEach(item => {
-      item.addEventListener('click', function() {
-        document.querySelectorAll('.wp-query-switcher__item').forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-        // Nếu chuyển sang PHP, bạn có thể xử lý chuyển đổi theo nhu cầu
-      });
-    });
-
-    // Generate Query: Thu thập dữ liệu từ tất cả các trường input
-    document.getElementById('generate_button').addEventListener('click', function() {
-      const query = {};
-
-      // Hàm tiện ích: lấy giá trị từ input text, select, checkbox
-      function getValue(id) {
-        const el = document.getElementById(id);
-        if(!el) return null;
-        if(el.type === 'checkbox') return el.checked;
-        return el.value.trim();
+      
+      // Xử lý repeater cho Tax Query
+      const taxRows = document.querySelectorAll('.tax-query-item');
+      if (taxRows.length > 0) {
+        query.tax_query = {};
+        taxRows.forEach((row, index) => {
+          const taxonomy = row.querySelector('.tax-taxonomy').value;
+          const fieldVal = row.querySelector('.tax-field').value;
+          const terms = row.querySelector('.tax-terms').value;
+          const operator = row.querySelector('.tax-operator').value;
+          if (taxonomy || fieldVal || terms || operator) {
+            query.tax_query[index] = {
+              taxonomy: taxonomy,
+              field: fieldVal,
+              terms: terms ? parseCSV(terms) : [],
+              operator: operator
+            };
+          }
+        });
+        const relation = document.getElementById('tax_query_relation').value;
+        if (relation) {
+          query.tax_query.relation = relation;
+        }
       }
       
-      // General
-      query.post_type = getValue('post_type');
-      query.post_status = getValue('post_status');
-      query.order = getValue('order');
-      query.orderby = getValue('orderby');
-
-      // Pagination
-      query.posts_per_page = getValue('posts_per_page');
-      query.offset = getValue('offset');
-      query.paged = getValue('paged');
-      query.page = getValue('page');
-      query.ignore_sticky_posts = getValue('ignore_sticky_posts');
-
-      // Post & Page
-      query.p = getValue('p');
-      query.name = getValue('name');
-      query.title = getValue('title');
-      query.page_id = getValue('page_id');
-      query.pagename = getValue('pagename');
-      query.post_parent = getValue('post_parent');
-      query.post_parent__in = getValue('post_parent__in') ? getValue('post_parent__in').split(/\s*,\s*/) : [];
-      query.post_parent__not_in = getValue('post_parent__not_in') ? getValue('post_parent__not_in').split(/\s*,\s*/) : [];
-      query.post__in = getValue('post__in') ? getValue('post__in').split(/\s*,\s*/) : [];
-      query.post__not_in = getValue('post__not_in') ? getValue('post__not_in').split(/\s*,\s*/) : [];
-      query.post_name__in = getValue('post_name__in') ? getValue('post_name__in').split(/\s*,\s*/) : [];
-
-      // Author
-      query.author = getValue('author');
-      query.author_name = getValue('author_name');
-
-      // Category & Tag
-      query.cat = getValue('cat');
-      query.category_name = getValue('category_name');
-      query.category__and = getValue('category__and') ? getValue('category__and').split(/\s*,\s*/) : [];
-      query.category__in = getValue('category__in') ? getValue('category__in').split(/\s*,\s*/) : [];
-      query.category__not_in = getValue('category__not_in') ? getValue('category__not_in').split(/\s*,\s*/) : [];
-      query.tag = getValue('tag');
-      query.tag_id = getValue('tag_id');
-      query.tag__and = getValue('tag__and') ? getValue('tag__and').split(/\s*,\s*/) : [];
-      query.tag__in = getValue('tag__in') ? getValue('tag__in').split(/\s*,\s*/) : [];
-      query.tag__not_in = getValue('tag__not_in') ? getValue('tag__not_in').split(/\s*,\s*/) : [];
-      query.tag_slug__and = getValue('tag_slug__and') ? getValue('tag_slug__and').split(/\s*,\s*/) : [];
-      query.tag_slug__in = getValue('tag_slug__in') ? getValue('tag_slug__in').split(/\s*,\s*/) : [];
-
-      // Tax Query
-      const taxQuery = {};
-      const taxRows = document.querySelectorAll('#tax_query_container .wp-query-repeater__row');
-      taxRows.forEach((row, index) => {
-        const taxonomy = row.querySelector('.tax-taxonomy').value.trim();
-        const field = row.querySelector('.tax-field').value;
-        const terms = row.querySelector('.tax-terms').value.trim();
-        const operator = row.querySelector('.tax-operator').value;
-        if(taxonomy || field || terms || operator) {
-          taxQuery[index] = {
-            taxonomy,
-            field,
-            terms: terms ? terms.split(/\s*,\s*/) : [],
-            operator
-          };
+      // Xử lý repeater cho Meta Query
+      const metaRows = document.querySelectorAll('.meta-query-item');
+      if (metaRows.length > 0) {
+        query.meta_query = {};
+        metaRows.forEach((row, index) => {
+          const key = row.querySelector('.meta-key').value;
+          const value = row.querySelector('.meta-value').value;
+          const compare = row.querySelector('.meta-compare').value;
+          if (key || value || compare) {
+            query.meta_query[index] = { key, value, compare };
+          }
+        });
+        const relation = document.getElementById('meta_query_relation').value;
+        if (relation) {
+          query.meta_query.relation = relation;
+        }
+      }
+      
+      // Xử lý repeater cho Date Query
+      const dateRows = document.querySelectorAll('.date-query-item');
+      if (dateRows.length > 0) {
+        query.date_query = {};
+        dateRows.forEach((row, index) => {
+          const column = row.querySelector('.date-column').value;
+          const after = row.querySelector('.date-after').value;
+          const before = row.querySelector('.date-before').value;
+          const inclusive = row.querySelector('.date-inclusive').checked;
+          if (column || after || before) {
+            query.date_query[index] = { column, after, before, inclusive };
+          }
+        });
+        const relation = document.getElementById('date_query_relation').value;
+        if (relation) {
+          query.date_query.relation = relation;
+        }
+      }
+      
+      // Cập nhật nội dung của tab JSON và PHP
+      document.getElementById('result-json').textContent = JSON.stringify(query, null, 2);
+      document.getElementById('result-php').textContent = generatePHP(query);
+    }
+    
+    // Lắng nghe sự kiện thay đổi ở các trường input/select
+    document.querySelectorAll('.field').forEach(el => {
+      el.addEventListener('input', updateQuery);
+      el.addEventListener('change', updateQuery);
+    });
+    
+    // Repeater cho Tax Query với layout theo flex
+    document.getElementById('addTaxQuery').addEventListener('click', function(){
+      const container = document.createElement('div');
+      container.className = 'tax-query-item position-relative mb-3 p-2 border rounded';
+      container.innerHTML = `
+        <span class="remove-item">&times;</span>
+        <div class="flex-container">
+          <div>
+            <label class="form-label">Taxonomy</label>
+            <input type="text" class="form-control tax-taxonomy" placeholder="Taxonomy slug">
+          </div>
+          <div>
+            <label class="form-label">Field</label>
+            <select class="form-select tax-field">
+              <option value="">Select...</option>
+              <option value="term_id">Term ID</option>
+              <option value="name">Name</option>
+              <option value="slug">Slug</option>
+              <option value="term_taxonomy_id">Term taxonomy ID</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Taxonomy term(s)</label>
+            <input type="text" class="form-control tax-terms" placeholder="Comma-separated terms">
+          </div>
+          <div>
+            <label class="form-label">Operator</label>
+            <select class="form-select tax-operator">
+              <option value="">Select...</option>
+              <option value="IN">IN</option>
+              <option value="NOT IN">NOT IN</option>
+              <option value="AND">AND</option>
+              <option value="EXISTS">EXISTS</option>
+              <option value="NOT EXISTS">NOT EXISTS</option>
+            </select>
+          </div>
+        </div>
+      `;
+      container.querySelector('.remove-item').addEventListener('click', function(){
+        container.remove();
+        updateQuery();
+      });
+      container.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', updateQuery);
+        el.addEventListener('change', updateQuery);
+      });
+      document.getElementById('taxQueryList').appendChild(container);
+      updateQuery();
+    });
+    
+    // Repeater cho Meta Query
+    document.getElementById('addMetaQuery').addEventListener('click', function(){
+      const container = document.createElement('div');
+      container.className = 'meta-query-item position-relative mb-3 p-2 border rounded';
+      container.innerHTML = `
+        <span class="remove-item">&times;</span>
+        <div class="flex-container">
+          <div>
+            <label class="form-label">Meta Key</label>
+            <input type="text" class="form-control meta-key" placeholder="Meta key">
+          </div>
+          <div>
+            <label class="form-label">Meta Value</label>
+            <input type="text" class="form-control meta-value" placeholder="Meta value">
+          </div>
+          <div>
+            <label class="form-label">Compare</label>
+            <select class="form-select meta-compare">
+              <option value="">Select...</option>
+              <option value="=">=</option>
+              <option value="!=">!=</option>
+              <option value=">">></option>
+              <option value=">=">>=</option>
+              <option value="<"><</option>
+              <option value="<="><=</option>
+            </select>
+          </div>
+        </div>
+      `;
+      container.querySelector('.remove-item').addEventListener('click', function(){
+        container.remove();
+        updateQuery();
+      });
+      container.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', updateQuery);
+        el.addEventListener('change', updateQuery);
+      });
+      document.getElementById('metaQueryList').appendChild(container);
+      updateQuery();
+    });
+    
+    // Repeater cho Date Query
+    document.getElementById('addDateQuery').addEventListener('click', function(){
+      const container = document.createElement('div');
+      container.className = 'date-query-item position-relative mb-3 p-2 border rounded';
+      container.innerHTML = `
+        <span class="remove-item">&times;</span>
+        <div class="flex-container">
+          <div>
+            <label class="form-label">Column</label>
+            <input type="text" class="form-control date-column" placeholder="e.g. post_date">
+          </div>
+          <div>
+            <label class="form-label">After</label>
+            <input type="text" class="form-control date-after" placeholder="YYYY-MM-DD">
+          </div>
+          <div>
+            <label class="form-label">Before</label>
+            <input type="text" class="form-control date-before" placeholder="YYYY-MM-DD">
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input date-inclusive" id="inclusive-${Date.now()}">
+            <label class="form-check-label" for="inclusive-${Date.now()}">Inclusive</label>
+          </div>
+        </div>
+      `;
+      container.querySelector('.remove-item').addEventListener('click', function(){
+        container.remove();
+        updateQuery();
+      });
+      container.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', updateQuery);
+        el.addEventListener('change', updateQuery);
+      });
+      document.getElementById('dateQueryList').appendChild(container);
+      updateQuery();
+    });
+    
+    // Xử lý chuyển đổi giữa tab JSON và PHP của Generated Query
+    document.querySelectorAll('.wp-query-switcher__item').forEach(item => {
+      item.addEventListener('click', function() {
+        // Ẩn tất cả các nội dung và nút hành động
+        document.querySelectorAll('.wp-query-switcher__item').forEach(it => it.classList.remove('wp-query-switcher-active'));
+        document.querySelectorAll('.wp-query-result__content').forEach(el => el.classList.add('d-none'));
+        document.querySelectorAll('.wp-query-result__actions button').forEach(btn => btn.classList.add('d-none'));
+        // Hiển thị tab được chọn
+        item.classList.add('wp-query-switcher-active');
+        let target = item.getAttribute('data-target');
+        document.getElementById(target).classList.remove('d-none');
+        if(target === 'result-json') {
+          document.getElementById('copyBtn-json').classList.remove('d-none');
+          document.getElementById('resetBtn-json').classList.remove('d-none');
+        } else if(target === 'result-php') {
+          document.getElementById('copyBtn-php').classList.remove('d-none');
+          document.getElementById('resetBtn-php').classList.remove('d-none');
         }
       });
-      const taxRelation = getValue('tax_query_relation');
-      if(Object.keys(taxQuery).length > 0) {
-        query.tax_query = Object.assign({}, taxQuery, { relation: taxRelation });
-      }
-
-      // Meta Query & Date Query: có thể mở rộng sau
-      query.meta_query = {}; 
-      query.date_query = {};
-
-      // Misc
-      query.has_password = getValue('has_password');
-      query.post_password = getValue('post_password');
-      query.comment_count = getValue('comment_count');
-      query.perm = getValue('perm');
-      query.post_mime_type = getValue('post_mime_type');
-
-      // Hiển thị kết quả dưới dạng JSON
-      document.getElementById('query_output').textContent = JSON.stringify(query, null, 2);
     });
-
-    // Copy to Clipboard
-    document.getElementById('copy_button').addEventListener('click', function() {
-      const text = document.getElementById('query_output').textContent;
+    
+    // Copy to Clipboard cho JSON
+    document.getElementById('copyBtn-json').addEventListener('click', function(){
+      const text = document.getElementById('result-json').textContent;
       navigator.clipboard.writeText(text).then(() => {
-        alert('Copied to clipboard!');
+        alert('Copied JSON to clipboard!');
       });
     });
-
-    // Reset Query
-    document.getElementById('reset_button').addEventListener('click', function() {
-      location.reload();
+    // Copy to Clipboard cho PHP
+    document.getElementById('copyBtn-php').addEventListener('click', function(){
+      const text = document.getElementById('result-php').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied PHP to clipboard!');
+      });
     });
+    
+    // Hàm Reset Query: xóa hết các trường nhập liệu và repeater
+    function resetQuery() {
+      document.querySelectorAll('.field').forEach(el => {
+        if (el.type === 'checkbox') {
+          el.checked = false;
+        } else {
+          el.value = '';
+        }
+      });
+      document.getElementById('taxQueryList').innerHTML = '';
+      document.getElementById('metaQueryList').innerHTML = '';
+      document.getElementById('dateQueryList').innerHTML = '';
+      updateQuery();
+    }
+    // Gán sự kiện Reset cho cả 2 nút Reset
+    document.getElementById('resetBtn-json').addEventListener('click', resetQuery);
+    document.getElementById('resetBtn-php').addEventListener('click', resetQuery);
+    
+    // Cập nhật query ban đầu
+    updateQuery();
   </script>
 </body>
 </html>

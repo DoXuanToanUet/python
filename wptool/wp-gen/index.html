@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WP Query Generator - Vertical Tabs</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>WP Query Generator</h1>
+      <p>
+        Ultimate tool for creating custom WordPress queries &amp; generating arguments for WP_Query class in JSON format.
+      </p>
+    </header>
+
+    <div class="main">
+      <!-- Menu Tab (Vertical) -->
+      <div class="tabs-menu">
+        <div class="tab-item active" data-target="tab-general">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FDEAD7" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="10" />
+            </svg>
+          </div>
+          <span>General</span>
+        </div>
+        <div class="tab-item" data-target="tab-pagination">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FDEAD7" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="10" />
+            </svg>
+          </div>
+          <span>Pagination</span>
+        </div>
+        <div class="tab-item" data-target="tab-postpage">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FDEAD7" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="10" />
+            </svg>
+          </div>
+          <span>Post &amp; Page</span>
+        </div>
+        <div class="tab-item" data-target="tab-author">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FDEAD7" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="10" />
+            </svg>
+          </div>
+          <span>Author</span>
+        </div>
+        <div class="tab-item" data-target="tab-cat-tag">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FDEAD7" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="10" />
+            </svg>
+          </div>
+          <span>Category &amp; Tag</span>
+        </div>
+        <div class="tab-item" data-target="tab-taxquery">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FDEAD7" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="10" />
+            </svg>
+          </div>
+          <span>Tax Query</span>
+        </div>
+        <div class="tab-item" data-target="tab-metaquery">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FDEAD7" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="10" />
+            </svg>
+          </div>
+          <span>Meta Query</span>
+        </div>
+        <div class="tab-item" data-target="tab-datequery">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FDEAD7" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="10" />
+            </svg>
+          </div>
+          <span>Date Query</span>
+        </div>
+        <div class="tab-item" data-target="tab-misc">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FDEAD7" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="10" />
+            </svg>
+          </div>
+          <span>Misc</span>
+        </div>
+      </div>
+
+      <!-- Nội dung các Tab -->
+      <div class="tabs-content">
+        <!-- General -->
+        <div class="tab-content active" id="tab-general">
+          <h2>General</h2>
+          <div class="form-group">
+            <label for="post_type">Post type</label>
+            <input type="text" id="post_type" placeholder='e.g. "post" or "any"'>
+            <small>Set post type slug. Use "any" to retrieve any type</small>
+          </div>
+          <div class="form-group">
+            <label for="post_status">Post status</label>
+            <select id="post_status">
+              <option value="">Select...</option>
+              <option value="publish">Publish</option>
+              <option value="pending">Pending</option>
+              <option value="draft">Draft</option>
+              <option value="future">Future</option>
+              <option value="private">Private</option>
+              <option value="trash">Trash</option>
+              <option value="any">Any</option>
+            </select>
+            <small>Use post status</small>
+          </div>
+          <div class="form-group">
+            <label for="order">Order</label>
+            <select id="order">
+              <option value="">Select...</option>
+              <option value="ASC">ASC</option>
+              <option value="DESC">DESC</option>
+            </select>
+            <small>Designates the ascending or descending order</small>
+          </div>
+          <div class="form-group">
+            <label for="orderby">Orderby</label>
+            <select id="orderby">
+              <option value="">Select...</option>
+              <option value="none">None</option>
+              <option value="ID">ID</option>
+              <option value="author">Author</option>
+              <option value="title">Title</option>
+              <option value="name">Name</option>
+              <option value="type">Type</option>
+              <option value="date">Date</option>
+              <option value="modified">Modified</option>
+              <option value="rand">Rand</option>
+              <option value="comment_count">Comment count</option>
+              <option value="relevance">Relevance</option>
+              <option value="menu_order">Menu order</option>
+              <option value="meta_value">Meta value</option>
+              <option value="meta_value_num">Meta value num</option>
+            </select>
+            <small>Designates orderby parameter</small>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="tab-content" id="tab-pagination">
+          <h2>Pagination</h2>
+          <div class="form-group">
+            <label for="posts_per_page">Posts per page</label>
+            <input type="text" id="posts_per_page" placeholder="Number of posts per page">
+            <small>Number of posts to show per page</small>
+          </div>
+          <div class="form-group">
+            <label for="offset">Offset</label>
+            <input type="text" id="offset" placeholder="Number of posts to skip">
+            <small>Number of posts to pass over</small>
+          </div>
+          <div class="form-group">
+            <label for="paged">Paged</label>
+            <input type="text" id="paged" placeholder="Page number">
+            <small>Page number for "Older Entries" link</small>
+          </div>
+          <div class="form-group">
+            <label for="page">Page</label>
+            <input type="text" id="page" placeholder="Static front page number">
+            <small>Page for a static front page</small>
+          </div>
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="ignore_sticky_posts">
+            <label for="ignore_sticky_posts">Ignore sticky posts</label>
+            <small>Ignore post stickiness</small>
+          </div>
+        </div>
+
+        <!-- Post & Page -->
+        <div class="tab-content" id="tab-postpage">
+          <h2>Post &amp; Page</h2>
+          <div class="form-group">
+            <label for="p">Post ID</label>
+            <input type="text" id="p" placeholder="Post ID">
+            <small>Use post ID to get single post</small>
+          </div>
+          <div class="form-group">
+            <label for="name">Post name</label>
+            <input type="text" id="name" placeholder="Post slug">
+            <small>Use post slug to get single post</small>
+          </div>
+          <div class="form-group">
+            <label for="title">Post title</label>
+            <input type="text" id="title" placeholder="Post title">
+            <small>Use post title to get single post</small>
+          </div>
+          <div class="form-group">
+            <label for="page_id">Page ID</label>
+            <input type="text" id="page_id" placeholder="Page ID">
+            <small>Use page ID to get single page</small>
+          </div>
+          <div class="form-group">
+            <label for="pagename">Page name</label>
+            <input type="text" id="pagename" placeholder="Page slug">
+            <small>Use slug to get single page</small>
+          </div>
+          <div class="form-group">
+            <label for="post_parent">Page parent</label>
+            <input type="text" id="post_parent" placeholder="Parent page ID">
+            <small>Use page ID to return only child pages (set 0 cho top-level)</small>
+          </div>
+          <div class="form-group">
+            <label for="post_parent__in">Page parent in</label>
+            <input type="text" id="post_parent__in" placeholder="Comma-separated page IDs">
+            <small>Specify page whose parent is in a list</small>
+          </div>
+          <div class="form-group">
+            <label for="post_parent__not_in">Page parent not in</label>
+            <input type="text" id="post_parent__not_in" placeholder="Comma-separated page IDs">
+            <small>Specify page whose parent is not in a list</small>
+          </div>
+          <div class="form-group">
+            <label for="post__in">Post in</label>
+            <input type="text" id="post__in" placeholder="Comma-separated post IDs">
+            <small>Specify posts to retrieve</small>
+          </div>
+          <div class="form-group">
+            <label for="post__not_in">Post not in</label>
+            <input type="text" id="post__not_in" placeholder="Comma-separated post IDs">
+            <small>Specify posts not to retrieve</small>
+          </div>
+          <div class="form-group">
+            <label for="post_name__in">Post name in</label>
+            <input type="text" id="post_name__in" placeholder="Comma-separated post slugs">
+            <small>Specify posts to retrieve</small>
+          </div>
+        </div>
+
+        <!-- Author -->
+        <div class="tab-content" id="tab-author">
+          <h2>Author</h2>
+          <div class="form-group">
+            <label for="author">Author</label>
+            <input type="text" id="author" placeholder="Author ID(s), comma separated">
+            <small>Use author id or comma-separated list of IDs</small>
+          </div>
+          <div class="form-group">
+            <label for="author_name">Author name</label>
+            <input type="text" id="author_name" placeholder="Author user_nicename">
+            <small>Use "user_nicename" - NOT name</small>
+          </div>
+        </div>
+
+        <!-- Category & Tag -->
+        <div class="tab-content" id="tab-cat-tag">
+          <h2>Category &amp; Tag</h2>
+          <div class="form-group">
+            <label for="cat">Category</label>
+            <input type="text" id="cat" placeholder="Category ID">
+            <small>Use category ID</small>
+          </div>
+          <div class="form-group">
+            <label for="category_name">Category name</label>
+            <input type="text" id="category_name" placeholder="Category slug">
+            <small>Use category slug</small>
+          </div>
+          <div class="form-group">
+            <label for="category__and">Category and</label>
+            <input type="text" id="category__and" placeholder="Comma-separated category IDs">
+            <small>Comma-separated list of category IDs</small>
+          </div>
+          <div class="form-group">
+            <label for="category__in">Category in</label>
+            <input type="text" id="category__in" placeholder="Comma-separated category IDs">
+            <small>Comma-separated list of category IDs</small>
+          </div>
+          <div class="form-group">
+            <label for="category__not_in">Category not in</label>
+            <input type="text" id="category__not_in" placeholder="Comma-separated category IDs">
+            <small>Comma-separated list of category IDs</small>
+          </div>
+          <div class="form-group">
+            <label for="tag">Tag</label>
+            <input type="text" id="tag" placeholder="Tag slug">
+            <small>Use tag slug</small>
+          </div>
+          <div class="form-group">
+            <label for="tag_id">Tag ID</label>
+            <input type="text" id="tag_id" placeholder="Tag ID">
+            <small>Use tag ID</small>
+          </div>
+          <div class="form-group">
+            <label for="tag__and">Tag and</label>
+            <input type="text" id="tag__and" placeholder="Comma-separated tag IDs">
+            <small>Comma-separated list of tag IDs</small>
+          </div>
+          <div class="form-group">
+            <label for="tag__in">Tag in</label>
+            <input type="text" id="tag__in" placeholder="Comma-separated tag IDs">
+            <small>Comma-separated list of tag IDs</small>
+          </div>
+          <div class="form-group">
+            <label for="tag__not_in">Tag not in</label>
+            <input type="text" id="tag__not_in" placeholder="Comma-separated tag IDs">
+            <small>Comma-separated list of tag IDs</small>
+          </div>
+          <div class="form-group">
+            <label for="tag_slug__and">Tag slug and</label>
+            <input type="text" id="tag_slug__and" placeholder="Comma-separated tag slugs">
+            <small>Comma-separated list of tag slugs</small>
+          </div>
+          <div class="form-group">
+            <label for="tag_slug__in">Tag slug in</label>
+            <input type="text" id="tag_slug__in" placeholder="Comma-separated tag slugs">
+            <small>Comma-separated list of tag slugs</small>
+          </div>
+        </div>
+
+        <!-- Tax Query -->
+        <div class="tab-content" id="tab-taxquery">
+          <h2>Tax Query</h2>
+          <div class="form-group">
+            <label for="tax_query_relation">Relation</label>
+            <select id="tax_query_relation">
+              <option value="">Select...</option>
+              <option value="AND">AND</option>
+              <option value="OR">OR</option>
+            </select>
+            <small>Logical relationship between taxonomy queries</small>
+          </div>
+          <!-- Repeater cho Tax Query -->
+          <div id="taxQueryRepeater">
+            <label>Tax query</label>
+            <div id="taxQueryList"></div>
+            <button type="button" id="addTaxQuery">Add Item</button>
+          </div>
+        </div>
+
+        <!-- Meta Query -->
+        <div class="tab-content" id="tab-metaquery">
+          <h2>Meta Query</h2>
+          <div class="form-group">
+            <label for="meta_query_relation">Relation</label>
+            <select id="meta_query_relation">
+              <option value="">Select...</option>
+              <option value="AND">AND</option>
+              <option value="OR">OR</option>
+            </select>
+            <small>Logical relationship between meta queries</small>
+          </div>
+          <!-- Repeater cho Meta Query -->
+          <div id="metaQueryRepeater">
+            <label>Meta query</label>
+            <div id="metaQueryList"></div>
+            <button type="button" id="addMetaQuery">Add Item</button>
+          </div>
+        </div>
+
+        <!-- Date Query -->
+        <div class="tab-content" id="tab-datequery">
+          <h2>Date Query</h2>
+          <div class="form-group">
+            <label for="date_query_relation">Relation</label>
+            <select id="date_query_relation">
+              <option value="">Select...</option>
+              <option value="AND">AND</option>
+              <option value="OR">OR</option>
+            </select>
+            <small>Logical relationship between date queries</small>
+          </div>
+          <!-- Repeater cho Date Query -->
+          <div id="dateQueryRepeater">
+            <label>Date query</label>
+            <div id="dateQueryList"></div>
+            <button type="button" id="addDateQuery">Add Item</button>
+          </div>
+        </div>
+
+        <!-- Misc -->
+        <div class="tab-content" id="tab-misc">
+          <h2>Misc</h2>
+          <div class="form-group">
+            <label for="has_password">Has password</label>
+            <select id="has_password">
+              <option value="">Select...</option>
+              <option value="0">Posts without passwords</option>
+              <option value="1">Posts with passwords</option>
+            </select>
+            <small>Get posts with/without password</small>
+          </div>
+          <div class="form-group">
+            <label for="post_password">Post password</label>
+            <input type="text" id="post_password" placeholder="Post password">
+            <small>Show posts with a particular password</small>
+          </div>
+          <div class="form-group">
+            <label for="comment_count">Comment count</label>
+            <input type="text" id="comment_count" placeholder="e.g. =5">
+            <small>Format: =NUM (operators: =, !=, >, >=, <, <=)</small>
+          </div>
+          <div class="form-group">
+            <label for="perm">User permission</label>
+            <input type="text" id="perm" placeholder="User permission">
+            <small>Show posts if user has the appropriate capability</small>
+          </div>
+          <div class="form-group">
+            <label for="post_mime_type">Post mime type</label>
+            <input type="text" id="post_mime_type" placeholder="Allowed mime types">
+            <small>Allowed mime types</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Generated Query Section với 2 tab: JSON và PHP -->
+  <div class="wp-query-result">
+    <div class="wp-query-result__header">
+      <div class="wp-query-result__title">Generated Query</div>
+      <div class="wp-query-switcher">
+        <div class="wp-query-switcher__item active" data-target="result-json">JSON</div>
+        <div class="wp-query-switcher__item" data-target="result-php">PHP</div>
+      </div>
+    </div>
+    <div class="wp-query-result__content" id="result-json">
+      <!-- Nội dung JSON sẽ được hiển thị ở đây -->
+      { "query": "your query here" }
+    </div>
+    <div class="wp-query-result__content hide" id="result-php">
+      <!-- Nội dung PHP sẽ được hiển thị ở đây -->
+      &lt;?php<br>$query_args = array();<br>$the_query = new WP_Query( $query_args );<br>?&gt;
+    </div>
+    <div class="wp-query-result__actions">
+      <button id="copyBtn-json">Copy JSON</button>
+      <button id="resetBtn-json">Reset JSON</button>
+      <button id="copyBtn-php" class="hide">Copy PHP</button>
+      <button id="resetBtn-php" class="hide">Reset PHP</button>
+    </div>
+  </div>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>

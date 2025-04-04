@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>WP Query Generator</title>
+  <!-- Include Highlight.js CSS (chọn theme phù hợp, ở đây dùng default) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <style>
+    /* Reset & cơ bản */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      color: #000;
+      background: #fff;
+      padding: 20px;
+    }
+    h1, h4 {
+      margin-bottom: 10px;
+    }
+    /* Container */
+    .container {
+      max-width: 1350px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      color: #facc15;
+    }
+    /* Layout chính */
+    .content {
+      display: flex;
+      /* gap: 20px; */
+      flex-wrap: wrap;
+    }
+    /* Vertical Tabs */
+    .tabs {
+      flex: 1 1 600px;
+      /* border: 1px solid #ddd; */
+      display: flex;
+      min-height: 600px;
+      /* box-shadow: 0 2px 8px rgba(0,0,0,0.1); */
+    }
+    .tab-nav {
+      width: 200px;
+      /* background: #f9f9f9; */
+      /* border-right: 1px solid #ddd; */
+      position: sticky;
+      top: 20px;
+      align-self: flex-start;
+    }
+    .tab-nav li {
+      list-style: none;
+      padding: 15px;
+      cursor: pointer;
+      /* border-bottom: 1px solid #ddd; */
+      transition: background 0.3s;
+      border-radius: 6px;
+    }
+    .tab-nav li:hover{
+        color:#a08828;
+    }
+   .tab-panel h4{
+    font-size: 20px;
+    margin-bottom: 30px;
+   }
+    .tab-nav li.active {
+      background: #facc15;
+      color: #000;
+    }
+    .tab-content {
+      flex: 1;
+      padding: 0px 20px;
+      overflow-y: auto;
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    /* Form styles */
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #64748B;
+    }
+    .form-group input[type="text"],
+    .form-group select {
+        display: block;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #334156;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #e0e7ef;
+    border-radius: 10px;
+    transition: .2s ease-in-out;
+    }
+    .form-group input[type="text"]:focus,
+    .form-group select:focus{
+        border: 1px solid #b3beca;
+    } 
+    .form-group input[type="text"]:focus-visible,
+    .form-group select:focus-visible{
+        border: 1px solid #939ca7;
+        outline: none;
+    } 
+    .form-group.checkbox {
+      display: flex;
+      align-items: center;
+    }
+    .form-group.checkbox input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    .repeater+button{
+        background: #facc15;
+        padding: 8px 14px;
+        color: #000;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    #add_tax_item{
+        background: #facc15;
+        padding: 8px 14px;
+        color: #000;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    /* Repeater */
+    .repeater {
+ 
+      /* border: 1px solid #eee; */
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+    }
+    .repeater h5 {
+      margin-bottom: 10px;
+    }
+    .repeater-item {
+      position: relative;
+      padding: 10px;
+      border: 1px dashed #0dc167;
+      margin-bottom: 10px;
+      background: #fafafa;
+      border-radius: 4px;
+      display: flex;
+      gap: 5px;
+    }
+    .repeater-item button.remove-item {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #f00;
+    }
+    .repeater button {
+      padding: 8px 12px;
+      background: #facc15;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #000;
+    }
+    /* Kết quả Query */
+    .wp-query-result {
+      /* flex: 1 1 400px; */
+      /* border: 1px solid #ddd; */
+      padding: 20px;
+      background: #f4f5f7;
+      /* box-shadow: 0 2px 8px rgba(0,0,0,0.1); */
+      position: sticky;
+      top: 20px;
+      align-self: flex-start;
+      border-radius: 10px;
+      width: 450px;
+    }
+    .wp-query-result__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .wp-query-result__title {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .wp-query-switcher {
+      display: flex;
+    }
+    .wp-query-switcher__item {
+      padding: 5px 10px;
+      cursor: pointer;
+      background: #facc15;
+      margin-left: 5px;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+    .wp-query-switcher__item.wp-query-switcher-active {
+      background: #000;
+      color: #fff;
+    }
+    .wp-query-result__content {
+      /* background: #fff; */
+      padding: 15px;
+      /* border: 1px solid #ddd; */
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      font-family: Consolas, monospace;
+    }
+    .d-none {
+      display: none;
+    }
+    .wp-query-result__actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .wp-query-result__actions button {
+      flex: 1;
+      padding: 10px;
+      background: #facc15;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+      position: relative;
+    }
+    /* Tooltip style */
+    .tooltip {
+      position: absolute;
+      top: -30px;
+      right: 0;
+      background: #000;
+      color: #fff;
+      padding: 3px 6px;
+      font-size: 0.8rem;
+      border-radius: 3px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .tooltip.show {
+      opacity: 1;
+    }
+    .toanweb-copyright{
+        text-align: center;
+        padding: 30px 0px 10px;
+        color: #939ca7;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .content {
+        flex-direction: column;
+      }
+      .tabs, .wp-query-result {
+        width: 100%;
+      }
+      .tab-nav {
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+      }
+      .tab-nav li {
+        flex: 1;
+        text-align: center;
+        border-right: 1px solid #ddd;
+      }
+    }
+    .tab-item svg{
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>WP Query Generator</h1>
+      <p>Ultimate tool for creating custom WordPress queries &amp; generating arguments for WP_Query class in JSON format</p>
+    </header>
+    <div class="content">
+      <!-- Left: Tabs & form -->
+      <div class="tabs">
+        <ul class="tab-nav">
+          <li class="tab-item active" data-tab="general">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+              </svg>
+              
+                General
+            </li>
+          <li class="tab-item" data-tab="pagination">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.242 5.992h12m-12 6.003H20.24m-12 5.999h12M4.117 7.495v-3.75H2.99m1.125 3.75H2.99m1.125 0H5.24m-1.92 2.577a1.125 1.125 0 1 1 1.591 1.59l-1.83 1.83h2.16M2.99 15.745h1.125a1.125 1.125 0 0 1 0 2.25H3.74m0-.002h.375a1.125 1.125 0 0 1 0 2.25H2.99" />
+              </svg>
+              
+            Pagination</li>
+          <li class="tab-item" data-tab="post-page">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+              </svg>
+              
+            Post &amp; Page</li>
+          <li class="tab-item" data-tab="author">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+              </svg>
+              
+            Author</li>
+          <li class="tab-item" data-tab="category-tag">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+              </svg>
+              
+            Category &amp; Tag</li>
+          <li class="tab-item" data-tab="tax-query">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+              </svg>
+              
+            Tax Query</li>
+          <li class="tab-item" data-tab="meta-query">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+              </svg>
+              
+            Meta Query</li>
+          <li class="tab-item" data-tab="date-query">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+              </svg>
+              
+            Date Query</li>
+          <li class="tab-item" data-tab="misc">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+              
+            Misc</li>
+        </ul>
+        <div class="tab-content">
+          <!-- Các tab form (General, Pagination, v.v.) được giữ nguyên như code trước -->
+          <!-- General Tab -->
+          <div class="tab-panel active" id="general">
+            <h4>General Parameters</h4>
+            <div class="form-group">
+              <label for="post_type">Post type</label>
+              <input type="text" id="post_type" placeholder='Set post type slug. Use "any" to retrieve any type'>
+            </div>
+            <div class="form-group">
+              <label for="post_status">Post status</label>
+              <select id="post_status">
+                <option value="">Select...</option>
+                <option value="publish">Publish</option>
+                <option value="pending">Pending</option>
+                <option value="draft">Draft</option>
+                <option value="future">Future</option>
+                <option value="private">Private</option>
+                <option value="trash">Trash</option>
+                <option value="any">Any</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="order">Order</label>
+              <select id="order">
+                <option value="">Select...</option>
+                <option value="ASC">ASC</option>
+                <option value="DESC">DESC</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="orderby">Orderby</label>
+              <select id="orderby">
+                <option value="">Select...</option>
+                <option value="none">None</option>
+                <option value="ID">ID</option>
+                <option value="author">Author</option>
+                <option value="title">Title</option>
+                <option value="name">Name</option>
+                <option value="type">Type</option>
+                <option value="date">Date</option>
+                <option value="modified">Modified</option>
+                <option value="rand">Rand</option>
+                <option value="comment_count">Comment count</option>
+                <option value="relevance">Relevance</option>
+                <option value="menu_order">Menu order</option>
+                <option value="meta_value">Meta value</option>
+                <option value="meta_value_num">Meta value num</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pagination Tab -->
+          <div class="tab-panel" id="pagination">
+            <h4>Pagination Parameters</h4>
+            <div class="form-group">
+              <label for="posts_per_page">Posts per page</label>
+              <input type="text" id="posts_per_page" placeholder="Number of posts to show per page">
+            </div>
+            <div class="form-group">
+              <label for="offset">Offset</label>
+              <input type="text" id="offset" placeholder="Number of posts to pass over">
+            </div>
+            <div class="form-group">
+              <label for="paged">Paged</label>
+              <input type="text" id="paged" placeholder="Number of page">
+            </div>
+            <div class="form-group">
+              <label for="page">Page</label>
+              <input type="text" id="page" placeholder="Page number for static front page">
+            </div>
+            <div class="form-group checkbox">
+              <input type="checkbox" id="ignore_sticky_posts">
+              <label for="ignore_sticky_posts">Ignore sticky posts</label>
+            </div>
+          </div>
+          <!-- Post & Page Tab -->
+          <div class="tab-panel" id="post-page">
+            <h4>Post &amp; Page Parameters</h4>
+            <div class="form-group">
+              <label for="p">Post ID</label>
+              <input type="text" id="p" placeholder="Use post ID to get single post">
+            </div>
+            <div class="form-group">
+              <label for="name">Post name</label>
+              <input type="text" id="name" placeholder="Use post slug to get single post">
+            </div>
+            <div class="form-group">
+              <label for="title">Post title</label>
+              <input type="text" id="title" placeholder="Use post title to get single post">
+            </div>
+            <div class="form-group">
+              <label for="page_id">Page ID</label>
+              <input type="text" id="page_id" placeholder="Use page ID to get single page">
+            </div>
+            <div class="form-group">
+              <label for="pagename">Page name</label>
+              <input type="text" id="pagename" placeholder="Use slug to get single page">
+            </div>
+            <div class="form-group">
+              <label for="post_parent">Page parent</label>
+              <input type="text" id="post_parent" placeholder="Use page id to return only child pages">
+            </div>
+            <div class="form-group">
+              <label for="post_parent__in">Page parent in</label>
+              <input type="text" id="post_parent__in" placeholder="Comma-separated page ids">
+            </div>
+            <div class="form-group">
+              <label for="post_parent__not_in">Page parent not in</label>
+              <input type="text" id="post_parent__not_in" placeholder="Comma-separated page ids">
+            </div>
+            <div class="form-group">
+              <label for="post__in">Post in</label>
+              <input type="text" id="post__in" placeholder="Comma-separated post ids">
+            </div>
+            <div class="form-group">
+              <label for="post__not_in">Post not in</label>
+              <input type="text" id="post__not_in" placeholder="Comma-separated post ids">
+            </div>
+            <div class="form-group">
+              <label for="post_name__in">Post name in</label>
+              <input type="text" id="post_name__in" placeholder="Comma-separated post slugs">
+            </div>
+          </div>
+          <!-- Author Tab -->
+          <div class="tab-panel" id="author">
+            <h4>Author Parameters</h4>
+            <div class="form-group">
+              <label for="author">Author</label>
+              <input type="text" id="author" placeholder="Use author id or comma-separated list of IDs">
+            </div>
+            <div class="form-group">
+              <label for="author_name">Author name</label>
+              <input type="text" id="author_name" placeholder='use "user_nicename" - NOT name'>
+            </div>
+          </div>
+          <!-- Category & Tag Tab -->
+          <div class="tab-panel" id="category-tag">
+            <h4>Category &amp; Tag Parameters</h4>
+            <div class="form-group">
+              <label for="cat">Category</label>
+              <input type="text" id="cat" placeholder="Use category id">
+            </div>
+            <div class="form-group">
+              <label for="category_name">Category name</label>
+              <input type="text" id="category_name" placeholder="Use category slug">
+            </div>
+            <div class="form-group">
+              <label for="category__and">Category and</label>
+              <input type="text" id="category__and" placeholder="Comma-separated category IDs">
+            </div>
+            <div class="form-group">
+              <label for="category__in">Category in</label>
+              <input type="text" id="category__in" placeholder="Comma-separated category IDs">
+            </div>
+            <div class="form-group">
+              <label for="category__not_in">Category not in</label>
+              <input type="text" id="category__not_in" placeholder="Comma-separated category IDs">
+            </div>
+            <div class="form-group">
+              <label for="tag">Tag</label>
+              <input type="text" id="tag" placeholder="Use tag slug">
+            </div>
+            <div class="form-group">
+              <label for="tag_id">Tag ID</label>
+              <input type="text" id="tag_id" placeholder="Use tag ID">
+            </div>
+            <div class="form-group">
+              <label for="tag__and">Tag and</label>
+              <input type="text" id="tag__and" placeholder="Comma-separated tag IDs">
+            </div>
+            <div class="form-group">
+              <label for="tag__in">Tag in</label>
+              <input type="text" id="tag__in" placeholder="Comma-separated tag IDs">
+            </div>
+            <div class="form-group">
+              <label for="tag__not_in">Tag not in</label>
+              <input type="text" id="tag__not_in" placeholder="Comma-separated tag IDs">
+            </div>
+            <div class="form-group">
+              <label for="tag_slug__and">Tag slug and</label>
+              <input type="text" id="tag_slug__and" placeholder="Comma-separated tag slugs">
+            </div>
+            <div class="form-group">
+              <label for="tag_slug__in">Tag slug in</label>
+              <input type="text" id="tag_slug__in" placeholder="Comma-separated tag slugs">
+            </div>
+          </div>
+          <!-- Tax Query Tab -->
+          <div class="tab-panel" id="tax-query">
+            <h4>Tax Query Parameters</h4>
+            <div class="form-group">
+              <label for="tax_query_relation">Relation</label>
+              <select id="tax_query_relation">
+                <option value="">Select...</option>
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+              </select>
+            </div>
+            <div class="repeater" id="tax_query_repeater">
+              <!-- <div class="repeater-item tax-item">
+                <div class="form-group">
+                  <label>Taxonomy</label>
+                  <input type="text" class="tax-taxonomy" placeholder="Use taxonomy slug">
+                </div>
+                <div class="form-group">
+                  <label>Field</label>
+                  <select class="tax-field">
+                    <option value="">Select...</option>
+                    <option value="term_id">Term ID</option>
+                    <option value="name">Name</option>
+                    <option value="slug">Slug</option>
+                    <option value="term_taxonomy_id">Term taxonomy ID</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Terms</label>
+                  <input type="text" class="tax-terms" placeholder="Comma-separated terms">
+                </div>
+                <div class="form-group">
+                  <label>Operator</label>
+                  <select class="tax-operator">
+                    <option value="">Select...</option>
+                    <option value="IN">IN</option>
+                    <option value="NOT IN">NOT IN</option>
+                    <option value="AND">AND</option>
+                    <option value="EXISTS">EXISTS</option>
+                    <option value="NOT EXISTS">NOT EXISTS</option>
+                  </select>
+                </div>
+                <button class="remove-item remove-tax-item">×</button>
+              </div> -->
+            </div>
+            <button id="add_tax_item">Add Item</button>
+          </div>
+          <!-- Meta Query Tab -->
+          <div class="tab-panel" id="meta-query">
+            <h4>Meta Parameters</h4>
+            <div class="form-group">
+              <label for="meta_query_relation">Relation</label>
+              <select id="meta_query_relation">
+                <option value="">Select...</option>
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+              </select>
+            </div>
+            <div class="repeater" id="meta_query_repeater">
+              <!-- <div class="repeater-item meta-item">
+                <div class="form-group">
+                  <label>Key</label>
+                  <input type="text" class="meta-key" placeholder="Meta key">
+                </div>
+                <div class="form-group">
+                  <label>Value</label>
+                  <input type="text" class="meta-value" placeholder="Meta value">
+                </div>
+                <div class="form-group">
+                  <label>Compare</label>
+                  <select class="meta-compare">
+                    <option value="=">=</option>
+                    <option value="!=">!=</option>
+                    <option value=">">&gt;</option>
+                    <option value=">=">&gt;=</option>
+                    <option value="<">&lt;</option>
+                    <option value="<=">&lt;=</option>
+                  </select>
+                </div>
+                <button class="remove-item remove-meta-item">×</button>
+              </div> -->
+            </div>
+            <button id="add_meta_item">Add Item</button>
+          </div>
+          <!-- Date Query Tab -->
+          <div class="tab-panel" id="date-query">
+            <h4>Date Parameters</h4>
+            <div class="form-group">
+              <label for="date_query_relation">Relation</label>
+              <select id="date_query_relation">
+                <option value="">Select...</option>
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+              </select>
+            </div>
+            <div class="repeater" id="date_query_repeater">
+              <!-- <div class="repeater-item date-item">
+                <div class="form-group">
+                  <label>Column</label>
+                  <select class="date-column">
+                    <option value="post_date">post_date</option>
+                    <option value="post_date_gmt">post_date_gmt</option>
+                    <option value="post_modified">post_modified</option>
+                    <option value="post_modified_gmt">post_modified_gmt</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>After</label>
+                  <input type="text" class="date-after" placeholder="YYYY-MM-DD">
+                </div>
+                <div class="form-group">
+                  <label>Before</label>
+                  <input type="text" class="date-before" placeholder="YYYY-MM-DD">
+                </div>
+                <button class="remove-item remove-date-item">×</button>
+              </div> -->
+            </div>
+            <button id="add_date_item">Add Item</button>
+          </div>
+          <!-- Misc Tab -->
+          <div class="tab-panel" id="misc">
+            <h4>Misc Parameters</h4>
+            <div class="form-group">
+              <label for="has_password">Has password</label>
+              <select id="has_password">
+                <option value="0">Posts without passwords</option>
+                <option value="1">Posts with passwords</option>
+                <option value="">Select...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="post_password">Post password</label>
+              <input type="text" id="post_password" placeholder="Show posts with a particular password">
+            </div>
+            <div class="form-group">
+              <label for="comment_count">Comment count</label>
+              <input type="text" id="comment_count" placeholder='Format: =NUM, !=, >, >=, <, <='>
+            </div>
+            <div class="form-group">
+              <label for="perm">User permission</label>
+              <input type="text" id="perm" placeholder="Show posts if user has the appropriate capability">
+            </div>
+            <div class="form-group">
+              <label for="post_mime_type">Post mime type</label>
+              <input type="text" id="post_mime_type" placeholder="Allowed mime types">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Right: Generated Query -->
+      <div class="wp-query-result">
+        <div class="wp-query-result__header d-flex justify-content-between align-items-center">
+          <div class="wp-query-result__title">Generated Query</div>
+          <div class="wp-query-switcher">
+            <div class="wp-query-switcher__item" data-target="result-json">JSON</div>
+            <div class="wp-query-switcher__item wp-query-switcher-active" data-target="result-php">PHP</div>
+          </div>
+        </div>
+        <div class="wp-query-result__content d-none" id="result-json"></div>
+        <div class="wp-query-result__content" id="result-php"></div>
+        <div class="wp-query-result__actions">
+          <button id="copyBtn-json" class="d-none">Copy to Clipboard<span class="tooltip"></span></button>
+          <button id="resetBtn-json" class="d-none">Reset Query<span class="tooltip"></span></button>
+          <button id="copyBtn-php">Copy to Clipboard<span class="tooltip"></span></button>
+          <button id="resetBtn-php">Reset Query<span class="tooltip"></span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Include Highlight.js JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+          // Utility: escape HTML
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;");
+    }
+    // Utility: show tooltip near a button
+    function showTooltip(btn, message) {
+      const tooltip = btn.querySelector('.tooltip');
+      tooltip.textContent = message;
+      tooltip.classList.add('show');
+      setTimeout(() => {
+        tooltip.classList.remove('show');
+      }, 2000);
+    }
+    // Tab switching for form
+    document.querySelectorAll('.tab-item').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Xóa lớp active của tất cả các tab-item và ẩn các tab-panel cũng như khối copyright nếu có
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+            panel.classList.remove('active');
+            // Nếu có khối copyright liền sau panel, ẩn nó
+            if (panel.nextElementSibling && panel.nextElementSibling.classList.contains('toanweb-copyright')) {
+                panel.nextElementSibling.style.display = 'none';
+            }
+            });
+            
+            // Thêm active cho tab vừa click
+            this.classList.add('active');
+            // Lấy id của tab-panel tương ứng từ data-tab
+            const tabId = this.getAttribute('data-tab');
+            const activePanel = document.getElementById(tabId);
+            if (activePanel) {
+            activePanel.classList.add('active');
+            // Nếu panel chưa có khối copyright liền sau, chèn vào; nếu đã có, hiển thị nó
+            if (!activePanel.nextElementSibling || !activePanel.nextElementSibling.classList.contains('toanweb-copyright')) {
+                activePanel.insertAdjacentHTML('afterend', '<div class="toanweb-copyright">1 sản phẩm phát triển bởi <a href="https://doxuantoan.com" target="_blank">ToanWeb (doxuantoan.com)</a></div>');
+            } else {
+                activePanel.nextElementSibling.style.display = 'block';
+            }
+            }
+        });
+        });
+    // Tab switching cho kết quả (JSON/PHP)
+    document.querySelectorAll('.wp-query-switcher__item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.wp-query-switcher__item').forEach(i => i.classList.remove('wp-query-switcher-active'));
+        this.classList.add('wp-query-switcher-active');
+        const target = this.getAttribute('data-target');
+        if(target === 'result-json') {
+          document.getElementById('result-json').classList.remove('d-none');
+          document.getElementById('result-php').classList.add('d-none');
+          document.getElementById('copyBtn-json').classList.remove('d-none');
+          document.getElementById('resetBtn-json').classList.remove('d-none');
+          document.getElementById('copyBtn-php').classList.add('d-none');
+          document.getElementById('resetBtn-php').classList.add('d-none');
+        } else {
+          document.getElementById('result-php').classList.remove('d-none');
+          document.getElementById('result-json').classList.add('d-none');
+          document.getElementById('copyBtn-php').classList.remove('d-none');
+          document.getElementById('resetBtn-php').classList.remove('d-none');
+          document.getElementById('copyBtn-json').classList.add('d-none');
+          document.getElementById('resetBtn-json').classList.add('d-none');
+        }
+      });
+    });
+    // Hàm chuyển đổi query từ form sang object và cập nhật syntax highlighting
+    function updateQuery() {
+      let query = {};
+
+      function addField(id, key, transform) {
+        let el = document.getElementById(id);
+        if(el) {
+          let val = (el.type === 'checkbox') ? el.checked : el.value;
+          if(val !== '' && val !== false) {
+            query[key] = transform ? transform(val) : val;
+          }
+        }
+      }
+      // General
+      addField('post_type', 'post_type');
+      addField('post_status', 'post_status');
+      addField('order', 'order');
+      addField('orderby', 'orderby');
+      // Pagination
+      addField('posts_per_page', 'posts_per_page');
+      addField('offset', 'offset');
+      addField('paged', 'paged');
+      addField('page', 'page');
+      let ignoreSticky = document.getElementById('ignore_sticky_posts');
+      if(ignoreSticky && ignoreSticky.checked) {
+        query['ignore_sticky_posts'] = true;
+      } else {
+        query['ignore_sticky_posts'] = false;
+      }
+      // Post & Page
+      addField('p', 'p');
+      addField('name', 'name');
+      addField('title', 'title');
+      addField('page_id', 'page_id');
+      addField('pagename', 'pagename');
+      addField('post_parent', 'post_parent');
+      addField('post_parent__in', 'post_parent__in', val => val.split(',').map(s => s.trim()));
+      addField('post_parent__not_in', 'post_parent__not_in', val => val.split(',').map(s => s.trim()));
+      addField('post__in', 'post__in', val => val.split(',').map(s => s.trim()));
+      addField('post__not_in', 'post__not_in', val => val.split(',').map(s => s.trim()));
+      addField('post_name__in', 'post_name__in', val => val.split(',').map(s => s.trim()));
+      // Author
+      addField('author', 'author');
+      addField('author_name', 'author_name');
+      // Category & Tag
+      addField('cat', 'cat');
+      addField('category_name', 'category_name');
+      addField('category__and', 'category__and', val => val.split(',').map(s => s.trim()));
+      addField('category__in', 'category__in', val => val.split(',').map(s => s.trim()));
+      addField('category__not_in', 'category__not_in', val => val.split(',').map(s => s.trim()));
+      addField('tag', 'tag');
+      addField('tag_id', 'tag_id');
+      addField('tag__and', 'tag__and', val => val.split(',').map(s => s.trim()));
+      addField('tag__in', 'tag__in', val => val.split(',').map(s => s.trim()));
+      addField('tag__not_in', 'tag__not_in', val => val.split(',').map(s => s.trim()));
+      addField('tag_slug__and', 'tag_slug__and', val => val.split(',').map(s => s.trim()));
+      addField('tag_slug__in', 'tag_slug__in', val => val.split(',').map(s => s.trim()));
+      // Tax Query
+      let taxItems = document.querySelectorAll('#tax_query_repeater .tax-item');
+      if(taxItems.length > 0) {
+        let taxQuery = { relation: document.getElementById('tax_query_relation').value || 'AND' };
+        taxItems.forEach((item, index) => {
+          let taxonomy = item.querySelector('.tax-taxonomy').value;
+          let field = item.querySelector('.tax-field').value;
+          let terms = item.querySelector('.tax-terms').value;
+          let operator = item.querySelector('.tax-operator').value;
+          if(taxonomy || field || terms || operator) {
+            taxQuery[index] = {
+              taxonomy: taxonomy,
+              field: field,
+              terms: terms ? terms.split(',').map(s => s.trim()) : [],
+              operator: operator
+            };
+          }
+        });
+        query['tax_query'] = taxQuery;
+      }
+      // Meta Query
+      let metaItems = document.querySelectorAll('#meta_query_repeater .meta-item');
+      if(metaItems.length > 0) {
+        let metaQuery = { relation: document.getElementById('meta_query_relation').value || 'AND' };
+        metaItems.forEach((item, index) => {
+          let key = item.querySelector('.meta-key').value;
+          let value = item.querySelector('.meta-value').value;
+          let compare = item.querySelector('.meta-compare').value;
+          if(key || value || compare) {
+            metaQuery[index] = {
+              key: key,
+              value: value,
+              compare: compare
+            };
+          }
+        });
+        query['meta_query'] = metaQuery;
+      }
+      // Date Query
+      let dateItems = document.querySelectorAll('#date_query_repeater .date-item');
+      if(dateItems.length > 0) {
+        let dateQuery = { relation: document.getElementById('date_query_relation').value || 'AND' };
+        dateItems.forEach((item, index) => {
+          let column = item.querySelector('.date-column').value;
+          let after = item.querySelector('.date-after').value;
+          let before = item.querySelector('.date-before').value;
+          if(column || after || before) {
+            dateQuery[index] = {
+              column: column,
+              after: after,
+              before: before
+            };
+          }
+        });
+        query['date_query'] = dateQuery;
+      }
+      // Misc
+      addField('has_password', 'has_password');
+      addField('post_password', 'post_password');
+      addField('comment_count', 'comment_count');
+      addField('perm', 'perm');
+      addField('post_mime_type', 'post_mime_type');
+      
+      // Cập nhật 2 tab kết quả với syntax highlighting
+      const jsonOutput = JSON.stringify(query, null, 2);
+      const phpOutput = "$query_args = " + phpExport(query) + ";\n\n// The Query\n$the_query = new WP_Query( $query_args );\n\n// The Loop\nif ( $the_query->have_posts() ) {\n\twhile ( $the_query->have_posts() ) {\n\t\t$the_query->the_post();\n\t}\n\twp_reset_postdata();\n} else {\n\t// no posts found\n}";
+      
+      document.getElementById('result-json').innerHTML = `<pre><code class="language-json">${escapeHtml(jsonOutput)}</code></pre>`;
+      document.getElementById('result-php').innerHTML = `<pre><code class="language-php">${escapeHtml(phpOutput)}</code></pre>`;
+      hljs.highlightAll();
+     
+
+    }
+    // Hàm xuất dữ liệu PHP kiểu giả (var_export)
+    function phpExport(obj, indent = '') {
+      let output = 'array(\n';
+      for (let key in obj) {
+        let value = obj[key];
+        output += indent + '  ';
+        if (isNaN(key)) {
+          output += "'" + key + "' => ";
+        }
+        if (typeof value === 'object' && value !== null) {
+          output += phpExport(value, indent + '  ');
+        } else if (typeof value === 'boolean') {
+          output += value ? 'true' : 'false';
+        } else if (!isNaN(value) && value !== '') {
+          output += value;
+        } else {
+          output += "'" + value + "'";
+        }
+        output += ",\n";
+      }
+      output += indent + ')';
+      return output;
+    }
+    // Lắng nghe sự thay đổi
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', updateQuery);
+      el.addEventListener('change', updateQuery);
+    });
+    // Copy & Reset cho từng tab
+    document.getElementById('copyBtn-json').addEventListener('click', function() {
+      const text = document.getElementById('result-json').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showTooltip(this, "Copied!");
+      });
+    });
+    document.getElementById('resetBtn-json').addEventListener('click', function() {
+      resetForm();
+      showTooltip(this, "Reset!");
+    });
+    document.getElementById('copyBtn-php').addEventListener('click', function() {
+      const text = document.getElementById('result-php').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showTooltip(this, "Copied!");
+      });
+    });
+    document.getElementById('resetBtn-php').addEventListener('click', function() {
+      resetForm();
+      showTooltip(this, "Reset!");
+    });
+    // Hàm reset toàn bộ form và các repeater
+    function resetForm() {
+      document.querySelectorAll('input, select').forEach(el => {
+        if(el.type === 'checkbox'){
+          el.checked = false;
+        } else {
+          el.value = '';
+        }
+      });
+      const taxRepeater = document.getElementById('tax_query_repeater');
+      taxRepeater.innerHTML = '';
+      taxRepeater.appendChild(createTaxItem());
+      const metaRepeater = document.getElementById('meta_query_repeater');
+      metaRepeater.innerHTML = '';
+      metaRepeater.appendChild(createMetaItem());
+      const dateRepeater = document.getElementById('date_query_repeater');
+      dateRepeater.innerHTML = '';
+      dateRepeater.appendChild(createDateItem());
+      updateQuery();
+    }
+    // Các hàm tạo item cho repeater
+    function createTaxItem() {
+      const div = document.createElement('div');
+      div.className = 'repeater-item tax-item';
+      div.innerHTML = `
+        <div class="form-group">
+          <label>Taxonomy</label>
+          <input type="text" class="tax-taxonomy" placeholder="Use taxonomy slug">
+        </div>
+        <div class="form-group">
+          <label>Field</label>
+          <select class="tax-field">
+            <option value="">Select...</option>
+            <option value="term_id">Term ID</option>
+            <option value="name">Name</option>
+            <option value="slug">Slug</option>
+            <option value="term_taxonomy_id">Term taxonomy ID</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Terms</label>
+          <input type="text" class="tax-terms" placeholder="Comma-separated terms">
+        </div>
+        <div class="form-group">
+          <label>Operator</label>
+          <select class="tax-operator">
+            <option value="">Select...</option>
+            <option value="IN">IN</option>
+            <option value="NOT IN">NOT IN</option>
+            <option value="AND">AND</option>
+            <option value="EXISTS">EXISTS</option>
+            <option value="NOT EXISTS">NOT EXISTS</option>
+          </select>
+        </div>
+        <button class="remove-item remove-tax-item">×</button>
+      `;
+      div.querySelector('.remove-tax-item').addEventListener('click', function() {
+        div.remove();
+        updateQuery();
+      });
+      div.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', updateQuery);
+        el.addEventListener('change', updateQuery);
+      });
+      return div;
+    }
+    function createMetaItem() {
+      const div = document.createElement('div');
+      div.className = 'repeater-item meta-item';
+      div.innerHTML = `
+        <div class="form-group">
+          <label>Key</label>
+          <input type="text" class="meta-key" placeholder="Meta key">
+        </div>
+        <div class="form-group">
+          <label>Value</label>
+          <input type="text" class="meta-value" placeholder="Meta value">
+        </div>
+        <div class="form-group">
+          <label>Compare</label>
+          <select class="meta-compare">
+            <option value="=">=</option>
+            <option value="!=">!=</option>
+            <option value=">">&gt;</option>
+            <option value=">=">&gt;=</option>
+            <option value="<">&lt;</option>
+            <option value="<=">&lt;=</option>
+          </select>
+        </div>
+        <button class="remove-item remove-meta-item">×</button>
+      `;
+      div.querySelector('.remove-meta-item').addEventListener('click', function() {
+        div.remove();
+        updateQuery();
+      });
+      div.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', updateQuery);
+        el.addEventListener('change', updateQuery);
+      });
+      return div;
+    }
+    function createDateItem() {
+      const div = document.createElement('div');
+      div.className = 'repeater-item date-item';
+      div.innerHTML = `
+        <div class="form-group">
+          <label>Column</label>
+          <select class="date-column">
+            <option value="post_date">post_date</option>
+            <option value="post_date_gmt">post_date_gmt</option>
+            <option value="post_modified">post_modified</option>
+            <option value="post_modified_gmt">post_modified_gmt</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>After</label>
+          <input type="text" class="date-after" placeholder="YYYY-MM-DD">
+        </div>
+        <div class="form-group">
+          <label>Before</label>
+          <input type="text" class="date-before" placeholder="YYYY-MM-DD">
+        </div>
+        <button class="remove-item remove-date-item">×</button>
+      `;
+      div.querySelector('.remove-date-item').addEventListener('click', function() {
+        div.remove();
+        updateQuery();
+      });
+      div.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', updateQuery);
+        el.addEventListener('change', updateQuery);
+      });
+      return div;
+    }
+    // Sự kiện Add Item cho repeater
+    document.getElementById('add_tax_item').addEventListener('click', function() {
+      const newItem = createTaxItem();
+      document.getElementById('tax_query_repeater').appendChild(newItem);
+    });
+    document.getElementById('add_meta_item').addEventListener('click', function() {
+      const newItem = createMetaItem();
+      document.getElementById('meta_query_repeater').appendChild(newItem);
+    });
+    document.getElementById('add_date_item').addEventListener('click', function() {
+      const newItem = createDateItem();
+      document.getElementById('date_query_repeater').appendChild(newItem);
+    });
+    // Thêm dòng copyright vào mỗi tab kết quả
+    
+    // Khởi tạo ban đầu
+    updateQuery();
+ 
+    });
+  
+  </script>
+</body>
+</html>
